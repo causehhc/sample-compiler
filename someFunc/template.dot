@@ -1,0 +1,6 @@
+digraph NFA{
+  rankdir=LR;
+  node [shape=circle];
+  edge [color=black];
+%s
+}
