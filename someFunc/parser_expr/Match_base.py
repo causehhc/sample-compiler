@@ -33,7 +33,8 @@ class Match_base:
 
         if self.i >= len(self.arr) - 1:
             self.i += 1
-            self.token = None
+            self.token = '#'
+            self.anls.append(self.token)
             return self.token
         else:
             self.i += 1
@@ -55,15 +56,28 @@ class Match_base:
     def func_main(self, parent):
         return False
 
+    # def run(self, flag):
+    #     self.res = self.func_main('root')
+    #     if self.i == len(self.arr) - 1:
+    #         tmp = self.arr[:self.i + 1]
+    #     else:
+    #         tmp = self.arr[:self.i]
+    #     if self.res is True:
+    #         if tmp != self.anls or len(self.arr) > len(self.anls):
+    #             self.error(2, 'unmatched characters')
+    #             if flag:
+    #                 self.res = False
+    #     if self.i == 0:
+    #         self.i += 1
+    #     return self.res, self.i - 1, self.tree
+
     def run(self, flag):
         self.res = self.func_main('root')
-        if self.i == len(self.arr) - 1:
-            tmp = self.arr[:self.i + 1]
-        else:
-            tmp = self.arr[:self.i]
         if self.res is True:
-            if tmp != self.anls or len(self.arr) > len(self.anls):
+            if len(self.arr) > len(self.anls):
                 self.error(2, 'unmatched characters')
                 if flag:
                     self.res = False
+        if self.i == 0:
+            self.i += 1
         return self.res, self.i - 1, self.tree

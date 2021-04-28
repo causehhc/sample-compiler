@@ -6,6 +6,9 @@ program -> decl_stmt main ( ) comp_stmt func_block
 func_block -> func_def func_block | ϵ
 """
 from Match_base import Match_base
+from someFunc.parser_expr.Statement_base import Match_base_stmt
+from someFunc.parser_expr.Statement_exec import Match_exec_stmt
+from someFunc.parser_expr.Statement_func import Match_func_stmt
 
 
 class Match_program_stmt(Match_base):
@@ -49,16 +52,28 @@ class Match_program_stmt(Match_base):
         return True
 
     def is_comp_stmt(self, iid):
-        # TODO
-        pass
+        handler = Match_exec_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_comp_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
 
     def is_decl_stmt(self, iid):
-        # TODO
-        pass
+        handler = Match_base_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_decl_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
 
     def is_func_def(self, iid):
-        # TODO
-        pass
+        handler = Match_func_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
 
 
 def main():
@@ -70,11 +85,12 @@ def main():
     for item in s:
         print('Detected string: ', item)
         handler.set_tokenList(item.split(' '))
-        res = handler.run(True)
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
-        handler.tree.show()
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
+        # handler.tree.show()
         print()
 
 

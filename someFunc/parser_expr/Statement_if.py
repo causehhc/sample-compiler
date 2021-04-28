@@ -73,15 +73,16 @@ def main():
     handler = Match_if_stmt()
     s = [
         'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
-        # 'if ( i < 10 ) i = i + 1 ; else i = 0 ;',
+        'if ( i < 10 ) i = i + 1 else const int j = 0 ;',
     ]
     for item in s:
         print('Detected string: ', item)
         handler.set_tokenList(item.split(' '))
-        res = handler.run(True)
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
         handler.tree.show()
         print()
 

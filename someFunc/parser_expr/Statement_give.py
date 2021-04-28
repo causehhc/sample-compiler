@@ -42,11 +42,12 @@ def main():
     ]
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item)
-        res = handler.run(True)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
         # handler.tree.show()
         print()
 

@@ -16,6 +16,7 @@ func_def_para_list -> func_def_para
 
 """
 from Match_base import Match_base
+from someFunc.parser_expr.Statement_exec import Match_exec_stmt
 
 
 class Match_func_stmt(Match_base):
@@ -81,20 +82,25 @@ class Match_func_stmt(Match_base):
         return True
 
     def is_func_type(self, iid):
-        # TODO
-        pass
+        if self.token in ['int', 'char', 'float']:
+            return True
+        return False
 
     def is_var(self):
-        # TODO
-        pass
+        return self.token.isidentifier()
 
     def is_comp_stmt(self, iid):
-        # TODO
-        pass
+        handler = Match_exec_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_comp_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
 
     def is_var_type(self, iid):
-        # TODO
-        pass
+        if self.token in ['int', 'char', 'float']:
+            return True
+        return False
 
 
 def main():
@@ -106,11 +112,12 @@ def main():
     for item in s:
         print('Detected string: ', item)
         handler.set_tokenList(item.split(' '))
-        res = handler.run(True)
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
-        handler.tree.show()
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
+        # handler.tree.show()
         print()
 
 

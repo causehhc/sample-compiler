@@ -63,19 +63,19 @@ class Match_b_expr(Match_base):
     def func_b_factor(self, parent):
         iid = self.creat_node('b_factor', parent)
 
-        if self.is_a_expr(iid):
-            if self.get_next(iid) is None:
-                return True
-            return True
-        elif self.is_r_expr(iid):
-            if self.get_next(iid) is None:
-                return True
-            return True
-        elif self.token == '!':
+        if self.token == '!':
             if self.get_next(iid) is None:
                 return True
             if self.func_main(iid):
                 return True
+        elif self.is_r_expr(iid):
+            if self.get_next(iid) is None:
+                return True
+            return True
+        elif self.is_a_expr(iid):
+            if self.get_next(iid) is None:
+                return True
+            return True
         return False
 
     def is_a_expr(self, iid):
@@ -97,22 +97,22 @@ class Match_b_expr(Match_base):
 
 def main():
     handler = Match_b_expr()
-    arr = [
-        ['1', '&&', '1', '>', '2'],
-        ['1', '+', '1', ')', '&&', '(', '(', '1', '+', '1', ')', '<=', '(', '1', '+', '1', ')'],
-        ['(', '1', '+', '1', ')', '&&', '(', '1', '+', '1', ')', '<=', '(', '1', '+', '1', ')'],
-        ['(', '1', '+', '1', ')', '&&', '(', '(', '1', '+', '1', ')', '<=', '(', '1', '+', '1', ')', ')']
+    s = [
+        '1 && 1',
+        '1 && 1 > 2',
+        '1 + 1 ) && ( ( 1 + 1 ) <= ( 1 + 1 )',
+        '( 1 + 1 ) && ( 1 + 1 ) <= ( 1 + 1 )',
     ]
-    for item in arr:
+    for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item)
-        res = handler.run(True)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
         # handler.tree.show()
         print()
-    pass
 
 
 if __name__ == '__main__':

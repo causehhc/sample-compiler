@@ -33,7 +33,6 @@ a_factor -> - a_para
   a_para -> ( a_expr )
           | const
           | var
-END:const, var, ops
 """
 from Match_base import Match_base
 
@@ -152,23 +151,24 @@ class Match_a_expr(Match_base):
 def main():
     handler = Match_a_expr()
     s = [
-        # ['1', '+', '1'],
-        # ['1', '*', '1'],
-        # ['(', '1', '+', '1', ')'],
-        ['1', '.', '1'],
-        ['1', '+', '+'],
-        ['(', '1', '+', '1', '+', '(', '1', ')'],
-        ['1', '*', '1', '+', '(', '1', ')', ')'],
-        ['1', '*', '-', '1'],
-        ['(', '(', '1', '+', '1', ')', ')'],
+        '1 + 1',
+        '1 * 1',
+        '( 1 + 1 )',
+        '1 . 1',
+        '1 + +',
+        '( 1 + 1 + ( 1 )',
+        '1 * 1 + ( 1 ) )',
+        '1 * - 1',
+        '( ( 1 + 1 ) )',
     ]
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item)
-        res = handler.run(True)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
+            print('error info:', handler.info)
+            print('error idx:', idx+1)
         # handler.tree.show()
         print()
 

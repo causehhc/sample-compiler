@@ -1,6 +1,6 @@
 """
 <语句> -> <声明语句> | <执行语句>
-<声明语句> -> <值声明> | <函数声明> | @
+<声明语句> -> <值声明> | <函数声明> | ϵ
 <值声明> -> <常量声明> | <变量声明>
 <常量声明> -> const <常量类型> <常量声明表>
 <常量类型> -> int | char | float
@@ -11,7 +11,7 @@
 <单变量声明> -> <变量> | <变量> = <表达式>
 <函数声明> -> <函数类型> <标识符> ( <函数声明形参列表> ) ;
 <函数类型> -> int | char | float | void
-<函数声明形参列表> -> <函数声明形参> | @
+<函数声明形参列表> -> <函数声明形参> | ϵ
 <函数声明形参> -> <变量类型> | <变量类型> , <函数声明形参>
 =============================================================
 stmt -> decl_stmt | exec_stmt
@@ -66,31 +66,10 @@ func_decl_formal_para_list -> func_decl_para
            func_decl_para' -> ϵ
                             | , func_decl_para
 
-=============================================================
-Symbol	Nullable	First	Follow
-const_decl	false	const	$
-const_decl_table	false	id	$
-const_decl_table'	false	, ;	$
-const_type	false	char float int	id
-decl_stmt	false	@ char const float int void	$
-func_decl	false	char float int void	$
-func_decl_formal_para_list	false	@ char float int	)
-func_decl_para	false	char float int	)
-func_decl_para'	true	, ϵ	)
-func_type	false	char float int void	id
-sin_var_decl	false	var	, ;
-sin_var_decl'	true	= ϵ	, ;
-stmt	false	@ char const exec_stmt float int void	$
-val_decl	false	char const float int	$
-var_decl	false	char float int	$
-var_decl_table	false	var	$
-var_decl_table'	false	, ;	$
-var_type	false	char float int	var
-=============================================================
-
 """
 from Match_base import Match_base
-from Expression_all import Match_expr, Match_g_expr
+from Expression_all import Match_expr
+from someFunc.parser_expr.Statement_exec import Match_exec_stmt
 
 
 class Match_base_stmt(Match_base):
@@ -100,20 +79,13 @@ class Match_base_stmt(Match_base):
     def func_main(self, parent):
         iid = self.creat_node('stmt', parent)
 
-        # if self.func_decl_stmt(iid):
-        #     return True
-        # elif self.is_g_expr():
-        #     if self.get_next(iid) is None:
-        #         return True
-        #     return True
-        if self.is_g_expr(iid):
+        if self.func_decl_stmt(iid):
             if self.get_next(iid) is None:
                 return True
-            if self.token == ';':
-                if self.get_next(iid) is None:
-                    return True
+            return True
+        elif self.is_exec_stmt(iid):
+            if self.get_next(iid) is None:
                 return True
-        elif self.func_decl_stmt(iid):
             return True
         return False
 
@@ -318,13 +290,8 @@ class Match_base_stmt(Match_base):
     def is_const(self):
         return self.token.isdigit()
 
-    def is_exec_stmt(self):
-        # TODO
-        return True
-
-    def is_g_expr(self, iid):
-        self.i = 0
-        handler = Match_g_expr()
+    def is_exec_stmt(self, iid):
+        handler = Match_exec_stmt()
         handler.set_tokenList(self.arr[self.i:])
         res, i, subtree = handler.run(False)
         self.i += i
@@ -339,21 +306,35 @@ class Match_base_stmt(Match_base):
         self.tree.paste(iid, subtree)
         return res
 
+    def run_export_decl_stmt(self, flag):
+        self.res = self.func_decl_stmt('root')
+        if self.i == len(self.arr) - 1:
+            tmp = self.arr[:self.i + 1]
+        else:
+            tmp = self.arr[:self.i]
+        if self.res is True:
+            if tmp != self.anls or len(self.arr) > len(self.anls):
+                self.error(2, 'unmatched characters')
+                if flag:
+                    self.res = False
+        return self.res, self.i - 1, self.tree
+
 
 def main():
     handler = Match_base_stmt()
     s = [
-        ['int', 'i', ',', 'j', ';'],
-        ['int', 'i', '=', '1', ';'],
-        ['int', 'i', '=', '1', ',', 'j', '=', '1', ';'],
+        'int i , j ;',
+        'int i = 1 ;',
+        'int i = 1 , j = 1 ;',
     ]
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item)
-        res = handler.run(True)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
-            print(handler.info)
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
         # handler.tree.show()
         print()
 

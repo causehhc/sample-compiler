@@ -1,105 +1,281 @@
-"""
-<执行语句> -> <数据处理语句> | <控制语句> | <复合语句>
-<数据处理语句> -> <赋值语句> | <函数调用语句>
-<赋值语句> -> <赋值表达式> ;
-<函数调用语句> -> <函数调用> ;
-<控制语句> -> <if语句> | <for语句> | <while语句> | <do while语句> | <return语句>
-<复合语句> -> { <语句表> }
-<语句表> -> <语句> | <语句> <语句表>
-<if语句> -> if ( <表达式> ) <语句> | if ( <表达式> ) <语句> else <语句>
-<for语句> -> for ( <表达式> ; <表达式> ; <表达式> ) <循环语句>
-<while语句> -> while ( <表达式> ) <循环语句>
-<do while语句> -> do <循环用复合语句> while ( <表达式> ) ;
-<循环语句> -> <声明语句> | <循环执行语句> | <循环用复合语句>
-<循环用复合语句> -> { <循环语句表> }
-<循环语句表> -> <循环语句> | <循环语句> <循环语句表>
-<循环执行语句> -> <循环用if语句> | <for语句> | <while语句> | <do while语句> | <return语句> | <break语句> | <continue语句>
-<循环用if语句> -> if ( <表达式> ) <循环语句> | if ( <表达式> ) <循环语句> else <循环语句>
-<return语句> -> return ; | return <表达式> ;
-<break语句> -> break ;
-<continue语句> -> continue ;
-=============================================================
-exec_stmt -> data_proc_stmt | ctrl_stmt | comp_stmt
-data_proc_stmt -> give_stmt | func_call_stmt
-give_stmt -> give_expr ;
-func_call_stmt -> func_call ;
-ctrl_stmt -> if_stmt | for_stmt | while_stmt | do_while_stmt | return_stmt
-comp_stmt -> { stmt_list }
-stmt_list -> stmt | stmt stmt_list
-if_stmt -> if ( expr ) stmt | if ( expr ) stmt else stmt
-for_stmt -> for ( expr ; expr ; expr ) loop_stmt
-while_stmt -> while ( expr ) loop_stmt
-do_while_stmt -> do comp_stmt_for_loops while ( expr ) ;
-loop_stmt -> decl_stmt | loop_exec_stmt | comp_stmt_for_loops
-comp_stmt_for_loops -> { list_of_loop_stmt }
-list_of_loop_stmt -> loop_stmt | loop_stmt list_of_loop_stmt
-loop_exec_stmt -> if_stmt_for_loop | for_stmt | while_stmt | do_while_stmt | return_stmt | break_stmt | continue_stmt
-if_stmt_for_loop -> if ( expr ) loop_stmt | if ( expr ) loop_stmt else loop_stmt
-return_stmt -> return ; | return expr ;
-break_stmt -> break ;
-continue_stmt -> continue ;
-=============================================================
-          exec_stmt -> data_proc_stmt
-                     | ctrl_stmt
-                     | comp_stmt
-     data_proc_stmt -> give_stmt
-                     | func_call_stmt
-          give_stmt -> give_expr ;
-     func_call_stmt -> func_call ;
-          ctrl_stmt -> if_stmt
-                     | for_stmt
-                     | while_stmt
-                     | do_while_stmt
-                     | return_stmt
-          comp_stmt -> { stmt_list }
-          stmt_list -> stmt stmt_list'
-            if_stmt -> if ( expr ) stmt if_stmt'
-           for_stmt -> for ( expr ; expr ; expr ) loop_stmt
-         while_stmt -> while ( expr ) loop_stmt
-      do_while_stmt -> do comp_stmt_for_loops while ( expr ) ;
-          loop_stmt -> decl_stmt
-                     | loop_exec_stmt
-                     | comp_stmt_for_loops
-comp_stmt_for_loops -> { list_of_loop_stmt }
-  list_of_loop_stmt -> decl_stmt list_of_loop_stmt'
-                     | loop_exec_stmt list_of_loop_stmt'
-                     | { list_of_loop_stmt } list_of_loop_stmt'
-     loop_exec_stmt -> if_stmt_for_loop
-                     | for ( expr ; expr ; expr ) loop_stmt
-                     | while ( expr ) loop_stmt
-                     | do comp_stmt_for_loops while ( expr ) ;
-                     | return_stmt
-                     | break_stmt
-                     | continue_stmt
-   if_stmt_for_loop -> if ( expr ) loop_stmt if_stmt_for_loop'
-        return_stmt -> return return_stmt'
-         break_stmt -> break ;
-      continue_stmt -> continue ;
-         stmt_list' -> ϵ
-                     | stmt stmt_list'
-           if_stmt' -> ϵ
-                     | else stmt
- list_of_loop_stmt' -> ϵ
-                     | decl_stmt list_of_loop_stmt'
-                     | if ( expr ) loop_stmt if_stmt_for_loop' list_of_loop_stmt'
-                     | for ( expr ; expr ; expr ) loop_stmt list_of_loop_stmt'
-                     | while ( expr ) loop_stmt list_of_loop_stmt'
-                     | do comp_stmt_for_loops while ( expr ) ; list_of_loop_stmt'
-                     | return return_stmt' list_of_loop_stmt'
-                     | break ; list_of_loop_stmt'
-                     | continue ; list_of_loop_stmt'
-                     | { list_of_loop_stmt } list_of_loop_stmt'
-  if_stmt_for_loop' -> ϵ
-                     | else loop_stmt
-       return_stmt' -> ;
-                     | expr ;
-
-
-
-"""
-from Match_base import Match_base
 from Expression_all import Match_expr, Match_g_expr
-from someFunc.parser_expr.Statement_base import Match_base_stmt
+from Match_base import Match_base
+
+
+class Match_base_stmt(Match_base):
+    def __init__(self):
+        super().__init__()
+
+    def func_main(self, parent):
+        iid = self.creat_node('stmt', parent)
+
+        if self.is_exec_stmt(iid):
+            if self.get_next(iid) is None:
+                return True
+            return True
+        elif self.func_decl_stmt(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        return False
+
+    def func_decl_stmt(self, parent):
+        iid = self.creat_node('decl_stmt', parent)
+
+        if self.func_val_decl(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        elif self.func_func_decl(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        return False
+
+    def func_val_decl(self, parent):
+        iid = self.creat_node('val_decl', parent)
+
+        if self.func_const_decl(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        elif self.func_var_decl(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        return False
+
+    def func_const_decl(self, parent):
+        iid = self.creat_node('const_decl', parent)
+
+        if self.token == 'const':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_const_type(iid):
+                if self.func_const_decl_table(iid):
+                    # if self.get_next(iid) is None:
+                    #     return True
+                    return True
+        return False
+
+    def func_const_type(self, parent):
+        iid = self.creat_node('const_type', parent)
+
+        if self.token in ['int', 'char', 'float']:
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return False
+
+    def func_const_decl_table(self, parent):
+        iid = self.creat_node('const_decl_table', parent)
+
+        if self.is_var():
+            if self.get_next(iid) is None:
+                return True
+            if self.token == '=':
+                if self.get_next(iid) is None:
+                    return True
+                if self.is_const():
+                    if self.get_next(iid) is None:
+                        return True
+                    if self.func_const_decl_table1(iid):
+                        # if self.get_next(iid) is None:
+                        #     return True
+                        return True
+        return False
+
+    def func_var_decl(self, parent):
+        iid = self.creat_node('var_decl', parent)
+
+        if self.func_var_type(iid):
+            if self.func_var_decl_table(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_var_type(self, parent):
+        iid = self.creat_node('var_type', parent)
+
+        if self.token in ['int', 'char', 'float']:
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return False
+
+    def func_var_decl_table(self, parent):
+        iid = self.creat_node('var_decl_table', parent)
+
+        if self.func_sin_var_decl(iid):
+            if self.func_var_decl_table1(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_sin_var_decl(self, parent):
+        iid = self.creat_node('sin_var_decl', parent)
+
+        if self.is_var():
+            if self.get_next(iid) is None:
+                return True
+            if self.func_sin_var_decl1(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_func_decl(self, parent):
+        iid = self.creat_node('func_decl', parent)
+
+        if self.func_func_type(iid):
+            if self.is_var():
+                if self.get_next(iid) is None:
+                    return True
+                if self.token == '(':
+                    if self.get_next(iid) is None:
+                        return True
+                    if self.func_func_decl_formal_para_list(iid):
+                        if self.token == ')':
+                            if self.get_next(iid) is None:
+                                return True
+                            if self.token == ';':
+                                if self.get_next(iid) is None:
+                                    return True
+                                return True
+        return False
+
+    def func_func_type(self, parent):
+        iid = self.creat_node('func_type', parent)
+
+        if self.token in ['int', 'char', 'float', 'void']:
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return False
+
+    def func_func_decl_formal_para_list(self, parent):
+        iid = self.creat_node('func_decl_formal_para_list', parent)
+
+        if self.func_func_decl_para(iid):
+            # if self.get_next(iid) is None:
+            #     return True
+            return True
+        return True
+
+    def func_func_decl_para(self, parent):
+        iid = self.creat_node('func_decl_para', parent)
+
+        if self.token == 'int':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_decl_para1(iid):
+                return True
+        elif self.token == 'char':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_decl_para1(iid):
+                return True
+        elif self.token == 'float':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_decl_para1(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_const_decl_table1(self, parent):
+        iid = self.creat_node('const_decl_table1', parent)
+
+        if self.token == ';':
+            if self.get_next(iid) is None:
+                return True
+            return True
+        elif self.token == ',':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_const_decl_table(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_var_decl_table1(self, parent):
+        iid = self.creat_node('var_decl_table1', parent)
+
+        if self.token == ';':
+            if self.get_next(iid) is None:
+                return True
+            return True
+        elif self.token == ',':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_var_decl_table(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return False
+
+    def func_sin_var_decl1(self, parent):
+        iid = self.creat_node('sin_var_decl1', parent)
+
+        if self.token == '=':
+            if self.get_next(iid) is None:
+                return True
+            if self.is_expr(iid):
+                if self.get_next(iid) is None:
+                    return True
+                return True
+        return True
+
+    def func_func_decl_para1(self, parent):
+        iid = self.creat_node('func_decl_para1', parent)
+
+        if self.token == ',':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_decl_para(iid):
+                # if self.get_next(iid) is None:
+                #     return True
+                return True
+        return True
+
+    def is_var(self):
+        return self.token.isidentifier()
+
+    def is_const(self):
+        return self.token.isdigit()
+
+    def is_exec_stmt(self, iid):
+        handler = Match_exec_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+    def is_expr(self, iid):
+        handler = Match_expr()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+    def run_export_decl_stmt(self, flag):
+        self.res = self.func_decl_stmt('root')
+        if self.i == len(self.arr) - 1:
+            tmp = self.arr[:self.i + 1]
+        else:
+            tmp = self.arr[:self.i]
+        if self.res is True:
+            if tmp != self.anls or len(self.arr) > len(self.anls):
+                self.error(2, 'unmatched characters')
+                if flag:
+                    self.res = False
+        return self.res, self.i - 1, self.tree
 
 
 class Match_exec_stmt(Match_base):
@@ -124,6 +300,10 @@ class Match_exec_stmt(Match_base):
             return True
         elif self.func_func_call_stmt(iid):
             return True
+
+        self.i = 0
+        self.token = self.arr[self.i]
+        self.anls.clear()
         return False
 
     def func_give_stmt(self, parent):
@@ -173,6 +353,10 @@ class Match_exec_stmt(Match_base):
             if self.get_next(iid) is None:
                 return True
             return True
+
+        self.i = 0
+        self.token = self.arr[self.i]
+        self.anls.clear()
         return False
 
     def func_comp_stmt(self, parent):
@@ -186,6 +370,10 @@ class Match_exec_stmt(Match_base):
                     if self.get_next(iid) is None:
                         return True
                     return True
+
+        self.i = 0
+        self.token = self.arr[self.i]
+        self.anls.clear()
         return False
 
     def func_stmt_list(self, parent):
@@ -195,8 +383,8 @@ class Match_exec_stmt(Match_base):
             if self.get_next(iid) is None:
                 return True
             if self.func_stmt_list1(iid):
-                if self.get_next(iid) is None:
-                    return True
+                # if self.get_next(iid) is None:
+                #     return True
                 return True
         return False
 
@@ -749,8 +937,216 @@ class Match_exec_stmt(Match_base):
         return self.res, self.i - 1, self.tree
 
 
-def main():
+class Match_func_stmt(Match_base):
+    def __init__(self):
+        super().__init__()
+
+    def func_main(self, parent):
+        iid = self.creat_node('func_def', parent)
+
+        if self.is_func_type(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.is_var():
+                if self.get_next(iid) is None:
+                    return True
+                if self.token == '(':
+                    if self.get_next(iid) is None:
+                        return True
+                    if self.func_func_def_para_list(iid):
+                        if self.token == ')':
+                            if self.get_next(iid) is None:
+                                return True
+                            if self.is_comp_stmt(iid):
+                                if self.get_next(iid) is None:
+                                    return True
+                                return True
+        return False
+
+    def func_func_def_para_list(self, parent):
+        iid = self.creat_node('func_def_para_list', parent)
+
+        if self.func_func_def_para(iid):
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return True
+
+    def func_func_def_para(self, parent):
+        iid = self.creat_node('func_def_para', parent)
+
+        if self.is_var_type(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.is_var():
+                if self.get_next(iid) is None:
+                    return True
+                if self.func_func_def_para1(iid):
+                    if self.get_next(iid) is None:
+                        return True
+                    return True
+        return False
+
+    def func_func_def_para1(self, parent):
+        iid = self.creat_node('func_def_para1', parent)
+
+        if self.token == ',':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_def_para(iid):
+                if self.get_next(iid) is None:
+                    return True
+                return True
+        return True
+
+    def is_func_type(self, iid):
+        if self.token in ['int', 'char', 'float']:
+            return True
+        return False
+
+    def is_var(self):
+        return self.token.isidentifier()
+
+    def is_comp_stmt(self, iid):
+        handler = Match_exec_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_comp_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+    def is_var_type(self, iid):
+        if self.token in ['int', 'char', 'float']:
+            return True
+        return False
+
+
+class Match_program_stmt(Match_base):
+    def __init__(self):
+        super().__init__()
+
+    def func_main(self, parent):
+        iid = self.creat_node('program', parent)
+
+        if self.is_decl_stmt(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == 'main':
+                if self.get_next(iid) is None:
+                    return True
+                if self.token == '(':
+                    if self.get_next(iid) is None:
+                        return True
+                    if self.token == ')':
+                        if self.get_next(iid) is None:
+                            return True
+                        if self.is_comp_stmt(iid):
+                            if self.get_next(iid) is None:
+                                return True
+                            if self.func_func_block(iid):
+                                if self.get_next(iid) is None:
+                                    return True
+                                return True
+        return False
+
+    def func_func_block(self, parent):
+        iid = self.creat_node('func_block', parent)
+
+        if self.is_func_def(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.func_func_block(iid):
+                if self.get_next(iid) is None:
+                    return True
+                return True
+        return True
+
+    def is_comp_stmt(self, iid):
+        handler = Match_exec_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_comp_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+    def is_decl_stmt(self, iid):
+        handler = Match_base_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run_export_decl_stmt(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+    def is_func_def(self, iid):
+        handler = Match_func_stmt()
+        handler.set_tokenList(self.arr[self.i:])
+        res, i, subtree = handler.run(False)
+        self.i += i
+        self.tree.paste(iid, subtree)
+        return res
+
+
+def main_base():
+    handler = Match_base_stmt()
+    s = [
+        'int i = 0 ;',
+        'int i = 1',
+        'int i , j ; }',
+        '{ int i = 0 ; }',
+        'int i = 1 ;',
+        'int i = 1 , j = 1 ;',
+        'const int j = 0 ;',
+    ]
+    for item in s:
+        print('Detected string: ', item)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
+        print('Compliance with the rules: ', res)
+        if res is False:
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
+        # handler.tree.show()
+        print()
+
+
+def main_exec():
     handler = Match_exec_stmt()
+    s = [
+        # 'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
+        'if ( i < 10 ) { i = i + 1 ; } else { const int j = 0 ; }',
+    ]
+    for item in s:
+        print('Detected string: ', item)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
+        print('Compliance with the rules: ', res)
+        if res is False:
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
+        # handler.tree.show()
+        print()
+
+
+def main_func():
+    handler = Match_func_stmt()
+    s = [
+        'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
+        # 'if ( i < 10 ) i = i + 1 ; else i = 0 ;',
+    ]
+    for item in s:
+        print('Detected string: ', item)
+        handler.set_tokenList(item.split(' '))
+        res, idx, tree = handler.run(True)
+        print('Compliance with the rules: ', res)
+        if res is False:
+            print('error info:', handler.info)
+            print('error idx:', idx + 1)
+        # handler.tree.show()
+        print()
+
+
+def main_program():
+    handler = Match_program_stmt()
     s = [
         'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
         # 'if ( i < 10 ) i = i + 1 ; else i = 0 ;',
@@ -768,4 +1164,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    print('hello world')
+    main_base()
+    # main_exec()
+    # main_func()
+    # main_program()
