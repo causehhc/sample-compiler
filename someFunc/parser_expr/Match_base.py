@@ -52,5 +52,18 @@ class Match_base:
             self.tree.create_node(tag='{}'.format(name), identifier=iid, parent=parent)
         return iid
 
+    def func_main(self, parent):
+        return False
+
     def run(self, flag):
-        pass
+        self.res = self.func_main('root')
+        if self.i == len(self.arr) - 1:
+            tmp = self.arr[:self.i + 1]
+        else:
+            tmp = self.arr[:self.i]
+        if self.res is True:
+            if tmp != self.anls or len(self.arr) > len(self.anls):
+                self.error(2, 'unmatched characters')
+                if flag:
+                    self.res = False
+        return self.res, self.i - 1, self.tree

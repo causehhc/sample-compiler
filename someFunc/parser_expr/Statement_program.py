@@ -1,76 +1,68 @@
 """
-<if语句> -> if ( <表达式> ) <语句> | if ( <表达式> ) <语句> else <语句>
+<程序> -> <声明语句> main() <复合语句> <函数块>
+<函数块> -> <函数定义> <函数块> | ϵ
 =============================================================
-if_stmt -> if ( expr ) base_stmt | if ( expr ) base_stmt else base_stmt
-=============================================================
- if_stmt -> if ( expr ) base_stmt if_stmt1
-if_stmt1 -> else base_stmt
-          | ϵ
+program -> decl_stmt main ( ) comp_stmt func_block
+func_block -> func_def func_block | ϵ
 """
 from Match_base import Match_base
-from Statement_base import Match_base_stmt
-from Expression_all import Match_expr
 
 
-class Match_if_stmt(Match_base):
+class Match_program_stmt(Match_base):
     def __init__(self):
         super().__init__()
 
     def func_main(self, parent):
-        iid = self.creat_node('if_stmt', parent)
+        iid = self.creat_node('program', parent)
 
-        if self.token == 'if':
+        if self.is_decl_stmt(iid):
             if self.get_next(iid) is None:
                 return True
-            if self.token == '(':
+            if self.token == 'main':
                 if self.get_next(iid) is None:
                     return True
-                if self.is_expr(iid):
+                if self.token == '(':
                     if self.get_next(iid) is None:
                         return True
                     if self.token == ')':
                         if self.get_next(iid) is None:
                             return True
-                        if self.is_base_stmt(iid):
+                        if self.is_comp_stmt(iid):
                             if self.get_next(iid) is None:
                                 return True
-                            if self.func_if_stmt1(iid):
+                            if self.func_func_block(iid):
                                 if self.get_next(iid) is None:
                                     return True
                                 return True
         return False
 
-    def func_if_stmt1(self, parent):
-        iid = self.creat_node('if_stmt1', parent)
+    def func_func_block(self, parent):
+        iid = self.creat_node('func_block', parent)
 
-        if self.token == 'else':
+        if self.is_func_def(iid):
             if self.get_next(iid) is None:
                 return True
-            if self.is_base_stmt(iid):
+            if self.func_func_block(iid):
                 if self.get_next(iid) is None:
                     return True
                 return True
         return True
 
-    def is_expr(self, iid):
-        handler = Match_expr()
-        handler.set_tokenList(self.arr[self.i:])
-        res, i, subtree = handler.run(False)
-        self.i += i
-        self.tree.paste(iid, subtree)
-        return res
+    def is_comp_stmt(self, iid):
+        # TODO
+        pass
 
-    def is_base_stmt(self, iid):
-        handler = Match_base_stmt()
-        handler.set_tokenList(self.arr[self.i:])
-        res, i, subtree = handler.run(False)
-        self.i += i
-        self.tree.paste(iid, subtree)
-        return res
+    def is_decl_stmt(self, iid):
+        # TODO
+        pass
+
+    def is_func_def(self, iid):
+        # TODO
+        pass
 
 
 def main():
-    handler = Match_if_stmt()
+    handler = Match_program_stmt()
     s = [
         'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
         # 'if ( i < 10 ) i = i + 1 ; else i = 0 ;',

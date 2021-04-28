@@ -13,7 +13,7 @@ class Match_g_expr(Match_base):
     def __init__(self):
         super().__init__()
 
-    def func_g_expr(self, parent):
+    def func_main(self, parent):
         iid = self.creat_node('g_expr', parent)
 
         if self.is_var():
@@ -39,19 +39,6 @@ class Match_g_expr(Match_base):
         self.tree.paste(iid, subtree)
         return res
 
-    def run(self, flag):
-        self.res = self.func_g_expr('root')
-        if self.i == len(self.arr) - 1:
-            tmp = self.arr[:self.i + 1]
-        else:
-            tmp = self.arr[:self.i]
-        if self.res is True:
-            if tmp != self.anls or len(self.arr) > len(self.anls):
-                self.error(2, 'unmatched characters')
-                if flag:
-                    self.res = False
-        return self.res, self.i - 1, self.tree
-
 
 from Expression_arithmetic import Match_a_expr
 from Expression_relation import Match_r_expr
@@ -63,7 +50,7 @@ class Match_expr(Match_base):
     def __init__(self):
         super().__init__()
 
-    def func_expr(self, parent):
+    def func_main(self, parent):
         iid = self.creat_node('expr', parent)
 
         if self.is_g_expr(iid):
@@ -119,19 +106,6 @@ class Match_expr(Match_base):
         self.i += i
         self.tree.paste(iid, subtree)
         return res
-
-    def run(self, flag):
-        self.res = self.func_expr('root')
-        if self.i == len(self.arr) - 1:
-            tmp = self.arr[:self.i + 1]
-        else:
-            tmp = self.arr[:self.i]
-        if self.res is True:
-            if tmp != self.anls or len(self.arr) > len(self.anls):
-                self.error(2, 'unmatched characters')
-                if flag:
-                    self.res = False
-        return self.res, self.i - 1, self.tree
 
 
 def main():

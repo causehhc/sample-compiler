@@ -19,7 +19,7 @@ class Match_r_expr(Match_base):
     def __init__(self):
         super().__init__()
 
-    def func_r_expr(self, parent):
+    def func_main(self, parent):
         iid = self.creat_node('r_expr', parent)
 
         if self.is_a_expr(iid):
@@ -48,19 +48,6 @@ class Match_r_expr(Match_base):
         self.i += i
         self.tree.paste(iid, subtree)
         return res
-
-    def run(self, flag):
-        self.res = self.func_r_expr('root')
-        if self.i == len(self.arr) - 1:
-            tmp = self.arr[:self.i + 1]
-        else:
-            tmp = self.arr[:self.i]
-        if self.res is True:
-            if tmp != self.anls or len(self.arr) > len(self.anls):
-                self.error(2, 'unmatched characters')
-                if flag:
-                    self.res = False
-        return self.res, self.i - 1, self.tree
 
 
 def main():
