@@ -25,6 +25,9 @@ class Match_base:
 
     def get_next(self, parent):
         tmp = self.i - len(self.anls)
+        if tmp < 0:
+            tmp = 0
+            self.i += 1
         for i in range(tmp + 1):
             if self.i - tmp + i < len(self.arr):
                 self.anls.append(self.arr[self.i - tmp + i])
@@ -55,21 +58,6 @@ class Match_base:
 
     def func_main(self, parent):
         return False
-
-    # def run(self, flag):
-    #     self.res = self.func_main('root')
-    #     if self.i == len(self.arr) - 1:
-    #         tmp = self.arr[:self.i + 1]
-    #     else:
-    #         tmp = self.arr[:self.i]
-    #     if self.res is True:
-    #         if tmp != self.anls or len(self.arr) > len(self.anls):
-    #             self.error(2, 'unmatched characters')
-    #             if flag:
-    #                 self.res = False
-    #     if self.i == 0:
-    #         self.i += 1
-    #     return self.res, self.i - 1, self.tree
 
     def run(self, flag):
         self.res = self.func_main('root')
