@@ -59,6 +59,15 @@ class Match_base:
     def func_main(self, parent):
         return False
 
+    def is_var(self):
+        res = self.token.isidentifier()
+        if self.token in {"void", "main", "short", "long", "int", "double", "float", "while", "if", "else", "for", "break", "return"}:
+            res = False
+        return res
+
+    def is_const(self):
+        return self.token.isdigit()
+
     def run(self, flag):
         self.res = self.func_main('root')
         if self.res is True:

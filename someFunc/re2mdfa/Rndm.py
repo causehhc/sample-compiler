@@ -140,7 +140,7 @@ class Node_nfa:
 
     def view(self):
         self.generateGraph(self, [])
-        save_and_show('./out/nfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/nfa', self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'start':
@@ -220,7 +220,7 @@ class Node_dfa:
 
     def view(self):
         self.generateGraph(self, [])
-        save_and_show('./out/dfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/dfa', self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'accept':
@@ -337,7 +337,7 @@ class Node_mdfa:
     def view(self):
         self.generateGraph(self, [])
         self.__dot_edge = self.__dot_edge.replace(',', '_')
-        save_and_show('./out/mdfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/mdfa', self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'accept':
@@ -552,7 +552,7 @@ def anls(text):
 
 
 def main():
-    anls('aa|bb*')
+    anls('aa|bbc*')
 
 
 if __name__ == '__main__':

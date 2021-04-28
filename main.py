@@ -1,16 +1,13 @@
 import os
 import sys
 
-import cv2
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QGraphicsView, QGraphicsPixmapItem, \
-    QGraphicsScene, QLabel
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
 from ui import Ui_MainWindow
 from subui import Ui_rndm
 from someFunc.LexAnls_Hand import Control
 from someFunc.LexAnls import LexAnls
-from someFunc.Rndm import anls
 
 
 class MyMainForm(QMainWindow, Ui_MainWindow):
@@ -168,7 +165,7 @@ class MySubForm(QMainWindow, Ui_rndm):
         # self.view = QGraphicsView(self)
         # self.view.setGeometry(0, 0, 710, 650)
         self.actionStart.clicked.connect(self.start)
-        pix = QPixmap('./someFunc/out/nfa.png')
+        pix = QPixmap('someFunc/re2mdfa/out/nfa.png')
         lb1 = QLabel(self)
         lb1.setGeometry(0, 0, 300, 200)
         lb1.setStyleSheet("border: 2px solid red")
