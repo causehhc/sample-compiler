@@ -2,9 +2,12 @@ int a=1;
 int test_func (int);
 int main (){
     int i = 0, j = 0;
+    i = test_func(1);
     if(i == 0){
+        int i = 0;
         while(1){
-          i = test_func(1);
+            i = 1;
+            i = test_func(1);
         }
     }
     for(i = 0; i < 10; i = i + 1){

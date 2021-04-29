@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test1.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test2.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test3.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test4.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test4_1.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test5.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test6.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test7.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test8.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/someFunc/testfiles/test9.txt" charset="GBK" />
+  </component>
+</project>

@@ -1,4 +1,5 @@
-from Match_base import Match_base
+from someFunc.lexical.Automata import Lex_analyzer
+from someFunc.parser.Match_base import Match_base
 
 
 class Match_expr(Match_base):
@@ -33,84 +34,95 @@ class Match_expr(Match_base):
         return False
 
     def is_a_expr(self, iid):
-        self.i = 0
+        self.index = 0
         handler = Match_a_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_r_expr(self, iid):
-        self.i = 0
+        self.index = 0
         handler = Match_r_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_b_expr(self, iid):
-        self.i = 0
+        self.index = 0
         handler = Match_b_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_g_expr(self, iid):
-        self.i = 0
+        # self.index = 0
         handler = Match_g_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
 
 class Match_a_expr(Match_base):
     """
-    <表达式> -> <算术表达式> | <关系表达式> | <布尔表达式> | <赋值表达式>
-    <算术表达式> -> <算术表达式>+<项> | <算术表达式>-<项> | <项>
-    <项> -> <项>*<因子> | <项>/<因子> | <项>%<因子> | <因子>
-    <因子> -> (<算术表达式>) | <常量> | <变量> | <函数调用>
+    <算术表达式> -> <算术表达式> + <项> | <算术表达式> - <项> | <项>
+    <项> -> <项> * <因子> | <项> / <因子> | <项> % <因子> | <因子>
+    <因子> -> ( <算术表达式> ) | <常量> | <变量> | <函数调用>
     <常量> -> <数值型常量> | <字符型常量>
     <变量> -> <标识符>
-    <函数调用> -> <标识符> | (<实参列表>)
-    <实参列表> -> <实参> | #
-    <实参> -> <表达式> | <表达式>,<实参>
+    <函数调用> -> <标识符> | ( <实参列表> )
+    <实参列表> -> <实参> | ϵ
+    <实参> -> <表达式> | <表达式> , <实参>
     =============================================================
-    <算术表达式> -> <算术表达式>+<项> | <算术表达式>-<项> | <项>
-    <项> -> <项>*<因子> | <项>/<因子> | <项>%<因子> | <因子>
-    <因子> -> (<算术表达式>) | <常量> | <变量>
-    <常量> -> <数值型常量> | <字符型常量>
-    <变量> -> <标识符>
+    <a_expr> -> <a_expr> + <a_term> | <a_expr> - <a_term> | <a_term>
+    <a_term> -> <a_term> * <a_factor> | <a_term> / <a_factor> | <a_term> % <a_factor> | <a_factor>
+    <a_factor> -> ( <a_expr> ) | <a_const> | <a_var> | <func_call>
+    <a_const> -> <a_num_const> | <a_char_const>
+    <a_var> -> <a_id>
+    <func_call> -> <a_id> ( <args_list> )
+    <args_list> -> <args> | ϵ
+    <args> -> <expr> | <expr> , <args>
     =============================================================
-      a_expr -> a_item a_expr2
-     a_expr2 -> a_expr1 a_expr2
-              | ϵ
-     a_expr1 -> + a_item
-              | - a_item
-      a_item -> a_factor a_item2
-     a_item2 -> a_item1 a_item2
-              | ϵ
-     a_item1 -> * a_factor
-              | / a_factor
-              | % a_factor
-    a_factor -> - a_para
-              | a_para
-      a_para -> ( a_expr )
-              | const
-              | var
+   <a_expr> -> <a_term> <a_expr>''
+   <a_term> -> <a_factor> <a_term>''
+ <a_factor> -> ( <a_expr> )
+             | <a_const>
+             | <a_var>
+             | <func_call>
+  <a_const> -> <a_num_const>
+             | <a_char_const>
+    <a_var> -> <a_id>
+<func_call> -> <a_id> ( <args_list> )
+<args_list> -> <args>
+             | ϵ
+     <args> -> <expr> <args>'
+  <a_expr>' -> + <a_term>
+             | - <a_term>
+  <a_term>' -> * <a_factor>
+             | / <a_factor>
+             | % <a_factor>
+    <args>' -> ϵ
+             | , <args>
+ <a_expr>'' -> <a_expr>' <a_expr>''
+             | ϵ
+ <a_term>'' -> <a_term>' <a_term>''
+             | ϵ
+
     """
 
     def __init__(self):
@@ -119,18 +131,97 @@ class Match_a_expr(Match_base):
     def func_main(self, parent):
         iid = self.creat_node('a_expr', parent)
 
-        if self.func_a_item(iid):
+        if self.func_a_term(iid):
             if self.func_a_expr2(iid):
                 return True
         return False
 
-    def func_a_expr2(self, parent):
-        iid = self.creat_node('a_expr2', parent)
+    def func_a_term(self, parent):
+        iid = self.creat_node('a_term', parent)
 
-        if self.func_a_expr1(iid):
-            if self.func_a_expr2(iid):
+        if self.func_a_factor(iid):
+            if self.func_a_term2(iid):
                 return True
+        return False
+
+    def func_a_factor(self, parent):
+        iid = self.creat_node('a_factor', parent)
+
+        if self.token == '(':
+            if self.get_next(iid) is None:
+                return True
+            if self.func_main(iid):
+                if self.token == ')':
+                    if self.get_next(iid) is None:
+                        return True
+                    return True
+        elif self.func_func_call(iid):
+            return True
+        elif self.func_a_var(iid):
+            return True
+        elif self.func_a_const(iid):
+            return True
+        # elif self.func_a_const(iid):
+        #     return True
+        # elif self.func_a_var(iid):
+        #     return True
+        # elif self.func_func_call(iid):
+        #     return True
+        return False
+
+    def func_a_const(self, parent):
+        iid = self.creat_node('a_const', parent)
+
+        if self.is_const():
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return False
+
+    def func_a_var(self, parent):
+        iid = self.creat_node('a_var', parent)
+
+        if self.is_var():
+            if self.get_next(iid) is None:
+                return True
+            return True
+        return False
+
+    def func_func_call(self, parent):
+        iid = self.creat_node('func_call', parent)
+        re_num = 0
+
+        if self.is_var():
+            re_num += 1
+            if self.get_next(iid) is None:
+                return True
+            if self.token == '(':
+                re_num += 1
+                if self.get_next(iid) is None:
+                    return True
+                if self.func_args_list(iid):
+                    if self.token == ')':
+                        re_num += 1
+                        if self.get_next(iid) is None:
+                            return True
+                        return True
+        self.reset_token(re_num)
+        return False
+
+    def func_args_list(self, parent):
+        iid = self.creat_node('args_list', parent)
+
+        if self.func_args(iid):
+            return True
         return True
+
+    def func_args(self, parent):
+        iid = self.creat_node('args', parent)
+
+        if self.func_main(iid):
+            if self.func_args1(iid):
+                return True
+        return False
 
     def func_a_expr1(self, parent):
         iid = self.creat_node('a_expr1', parent)
@@ -138,33 +229,17 @@ class Match_a_expr(Match_base):
         if self.token == '+':
             if self.get_next(iid) is None:
                 return True
-            if self.func_a_item(iid):
+            if self.func_a_term(iid):
                 return True
         elif self.token == '-':
             if self.get_next(iid) is None:
                 return True
-            if self.func_a_item(iid):
+            if self.func_a_term(iid):
                 return True
         return False
 
-    def func_a_item(self, parent):
-        iid = self.creat_node('a_item', parent)
-
-        if self.func_a_factor(iid):
-            if self.func_a_item2(iid):
-                return True
-        return False
-
-    def func_a_item2(self, parent):
-        iid = self.creat_node('a_item2', parent)
-
-        if self.func_a_item1(iid):
-            if self.func_a_item2(iid):
-                return True
-        return True
-
-    def func_a_item1(self, parent):
-        iid = self.creat_node('a_item1', parent)
+    def func_a_term1(self, parent):
+        iid = self.creat_node('a_term1', parent)
 
         if self.token == '*':
             if self.get_next(iid) is None:
@@ -183,38 +258,42 @@ class Match_a_expr(Match_base):
                 return True
         return False
 
-    def func_a_factor(self, parent):
-        iid = self.creat_node('a_factor', parent)
+    def func_args1(self, parent):
+        iid = self.creat_node('args1', parent)
 
-        if self.token == '-':
+        if self.token == ',':
             if self.get_next(iid) is None:
                 return True
-            if self.func_a_para(iid):
+            if self.func_args(iid):
                 return True
-        elif self.func_a_para(iid):
-            return True
-        return False
+        return True
 
-    def func_a_para(self, parent):
-        iid = self.creat_node('a_para', parent)
+    def func_a_expr2(self, parent):
+        iid = self.creat_node('a_expr2', parent)
 
-        if self.token == '(':
-            if self.get_next(iid) is None:
+        if self.func_a_expr1(iid):
+            if self.func_a_expr2(iid):
                 return True
-            if self.func_main(iid):
-                if self.token == ')':
-                    if self.get_next(iid) is None:
-                        return True
-                    return True
-        elif self.is_const():
-            if self.get_next(iid) is None:
+        return True
+
+    def func_a_term2(self, parent):
+        iid = self.creat_node('a_term2', parent)
+
+        if self.func_a_term1(iid):
+            if self.func_a_term2(iid):
                 return True
-            return True
-        elif self.is_var():
-            if self.get_next(iid) is None:
-                return True
-            return True
-        return False
+        return True
+
+    def run_export_func_call(self, flag):
+        self.res = self.func_func_call('root')
+        if self.res is True:
+            if len(self.token_list) > len(self.anls_proc):
+                self.error(2, 'unmatched characters')
+                if flag:
+                    self.res = False
+        if self.index == 0:
+            self.index += 1
+        return self.res, self.index - 1, self.tree
 
 
 class Match_r_expr(Match_base):
@@ -259,10 +338,10 @@ class Match_r_expr(Match_base):
     def is_a_expr(self, iid):
         handler = Match_a_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
@@ -346,20 +425,20 @@ class Match_b_expr(Match_base):
     def is_a_expr(self, iid):
         handler = Match_a_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_r_expr(self, iid):
         handler = Match_r_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
@@ -392,10 +471,10 @@ class Match_g_expr(Match_base):
     def is_expr(self, iid):
         handler = Match_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
@@ -403,15 +482,19 @@ class Match_g_expr(Match_base):
 def main_expr():
     handler = Match_expr()
     s = [
-        '1',
-        '1 + 1',
-        '1 || 1',
-        'a = 1',
-        'c = ( a + 1 ) > b'
+        # '1 ',
+        '1 + 1 ',
+        # 'i<10 '
+        # '1 || 1 ',
+        # 'a = 1 ',
+        # 'c = ( a + 1 ) > b ',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -424,19 +507,22 @@ def main_expr():
 def main_a_expr():
     handler = Match_a_expr()
     s = [
-        '1 + 1',
-        '1 * 1',
-        '( 1 + 1 )',
-        '1 . 1',
-        '1 + +',
-        '( 1 + 1 + ( 1 )',
-        '1 * 1 + ( 1 ) )',
-        '1 * - 1',
-        '( ( 1 + 1 ) )',
+        '1 + 1 ',
+        # '1 * 1',
+        # '( 1 + 1 )',
+        # '1 . 1',
+        # '1 + +',
+        # '( 1 + 1 + ( 1 )',
+        # '1 * 1 + ( 1 ) )',
+        # '1 * - 1',
+        # '( ( 1 + 1 ) )',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -449,13 +535,16 @@ def main_a_expr():
 def main_r_expr():
     handler = Match_r_expr()
     s = [
-        '( a + 1 ) > b',
-        '1 > 2',
-        '( 1 + 1 ) <= ( 1 + 1 )',
+        # '( a + 1 ) > b ',
+        'i < 2 ',
+        # '( 1 + 1 ) <= ( 1 + 1 ) ',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -473,9 +562,12 @@ def main_b_expr():
         '1 + 1 ) && ( ( 1 + 1 ) <= ( 1 + 1 )',
         '( 1 + 1 ) && ( 1 + 1 ) <= ( 1 + 1 )',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -490,9 +582,12 @@ def main_g_expr():
     s = [
         '1 = 1',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:

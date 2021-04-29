@@ -1,5 +1,6 @@
-from Expression import Match_expr, Match_g_expr
-from Match_base import Match_base
+from someFunc.lexical.Automata import Lex_analyzer
+from someFunc.parser.Match_base import Match_base
+from someFunc.parser.Expression import Match_expr, Match_g_expr, Match_a_expr
 
 
 class Match_base_stmt(Match_base):
@@ -103,9 +104,7 @@ class Match_base_stmt(Match_base):
         elif self.func_var_decl(iid):
             return True
 
-        self.i = 0
-        self.token = self.arr[self.i]
-        self.anls.clear()
+        self.reset_token()
         return False
 
     def func_const_decl(self, parent):
@@ -287,30 +286,30 @@ class Match_base_stmt(Match_base):
 
     def is_exec_stmt(self, iid):
         handler = Match_exec_stmt()
-        handler.set_tokenList(self.arr[self.i:])
+        handler.set_tokenList(self.token_list[self.index:])
         res, i, subtree = handler.run(False)
-        self.i += i
+        self.index += i
         self.tree.paste(iid, subtree)
         return res
 
     def is_expr(self, iid):
         handler = Match_expr()
-        handler.set_tokenList(self.arr[self.i:])
+        handler.set_tokenList(self.token_list[self.index:])
         res, i, subtree = handler.run(False)
-        self.i += i
+        self.index += i
         self.tree.paste(iid, subtree)
         return res
 
     def run_export_decl_stmt(self, flag):
         self.res = self.func_decl_stmt('root')
         if self.res is True:
-            if len(self.arr) > len(self.anls):
+            if len(self.token_list) > len(self.anls_proc):
                 self.error(2, 'unmatched characters')
                 if flag:
                     self.res = False
-        if self.i == 0:
-            self.i += 1
-        return self.res, self.i - 1, self.tree
+        if self.index == 0:
+            self.index += 1
+        return self.res, self.index - 1, self.tree
 
 
 class Match_exec_stmt(Match_base):
@@ -326,10 +325,11 @@ class Match_exec_stmt(Match_base):
     <for语句> -> for ( <表达式> ; <表达式> ; <表达式> ) <循环语句>
     <while语句> -> while ( <表达式> ) <循环语句>
     <do while语句> -> do <循环用复合语句> while ( <表达式> ) ;
-    <循环语句> -> <声明语句> | <循环执行语句> | <循环用复合语句>
+    <循环语句> -> <声明语句> | <循环执行语句>
+    <循环执行语句> -> <数据处理语句> | <循环控制语句> | <循环用复合语句>
     <循环用复合语句> -> { <循环语句表> }
     <循环语句表> -> <循环语句> | <循环语句> <循环语句表>
-    <循环执行语句> -> <循环用if语句> | <for语句> | <while语句> | <do while语句> | <return语句> | <break语句> | <continue语句>
+    <循环控制语句> -> <循环用if语句> | <for语句> | <while语句> | <do while语句> | <return语句> | <break语句> | <continue语句>
     <循环用if语句> -> if ( <表达式> ) <循环语句> | if ( <表达式> ) <循环语句> else <循环语句>
     <return语句> -> return ; | return <表达式> ;
     <break语句> -> break ;
@@ -345,70 +345,79 @@ class Match_exec_stmt(Match_base):
     if_stmt -> if ( expr ) stmt | if ( expr ) stmt else stmt
     for_stmt -> for ( expr ; expr ; expr ) loop_stmt
     while_stmt -> while ( expr ) loop_stmt
-    do_while_stmt -> do comp_stmt_for_loops while ( expr ) ;
-    loop_stmt -> decl_stmt | loop_exec_stmt | comp_stmt_for_loops
-    comp_stmt_for_loops -> { list_of_loop_stmt }
-    list_of_loop_stmt -> loop_stmt | loop_stmt list_of_loop_stmt
-    loop_exec_stmt -> if_stmt_for_loop | for_stmt | while_stmt | do_while_stmt | return_stmt | break_stmt | continue_stmt
-    if_stmt_for_loop -> if ( expr ) loop_stmt | if ( expr ) loop_stmt else loop_stmt
+    do_while_stmt -> do loop_comp_stmt while ( expr ) ;
+    loop_stmt -> decl_stmt | loop_exec_stmt
+    loop_exec_stmt -> data_proc_stmt | loop_ctrl_stmt | loop_comp_stmt
+    loop_comp_stmt -> { loop_stmt_list }
+    loop_stmt_list -> loop_stmt | loop_stmt loop_stmt_list
+    loop_ctrl_stmt -> loop_if_stmt | for_stmt | while_stmt | do_while_stmt | return_stmt | break_stmt | continue_stmt
+    loop_if_stmt -> if ( expr ) loop_stmt | if ( expr ) loop_stmt else loop_stmt
     return_stmt -> return ; | return expr ;
     break_stmt -> break ;
     continue_stmt -> continue ;
     =============================================================
-              exec_stmt -> data_proc_stmt
-                         | ctrl_stmt
-                         | comp_stmt
-         data_proc_stmt -> give_stmt
-                         | func_call_stmt
-              give_stmt -> give_expr ;
-         func_call_stmt -> func_call ;
-              ctrl_stmt -> if_stmt
-                         | for_stmt
-                         | while_stmt
-                         | do_while_stmt
-                         | return_stmt
-              comp_stmt -> { stmt_list }
-              stmt_list -> stmt stmt_list'
-                if_stmt -> if ( expr ) stmt if_stmt'
-               for_stmt -> for ( expr ; expr ; expr ) loop_stmt
-             while_stmt -> while ( expr ) loop_stmt
-          do_while_stmt -> do comp_stmt_for_loops while ( expr ) ;
-              loop_stmt -> decl_stmt
-                         | loop_exec_stmt
-                         | comp_stmt_for_loops
-    comp_stmt_for_loops -> { list_of_loop_stmt }
-      list_of_loop_stmt -> decl_stmt list_of_loop_stmt'
-                         | loop_exec_stmt list_of_loop_stmt'
-                         | { list_of_loop_stmt } list_of_loop_stmt'
-         loop_exec_stmt -> if_stmt_for_loop
-                         | for ( expr ; expr ; expr ) loop_stmt
-                         | while ( expr ) loop_stmt
-                         | do comp_stmt_for_loops while ( expr ) ;
-                         | return_stmt
-                         | break_stmt
-                         | continue_stmt
-       if_stmt_for_loop -> if ( expr ) loop_stmt if_stmt_for_loop'
-            return_stmt -> return return_stmt'
-             break_stmt -> break ;
-          continue_stmt -> continue ;
-             stmt_list' -> ϵ
-                         | stmt stmt_list'
-               if_stmt' -> ϵ
-                         | else stmt
-     list_of_loop_stmt' -> ϵ
-                         | decl_stmt list_of_loop_stmt'
-                         | if ( expr ) loop_stmt if_stmt_for_loop' list_of_loop_stmt'
-                         | for ( expr ; expr ; expr ) loop_stmt list_of_loop_stmt'
-                         | while ( expr ) loop_stmt list_of_loop_stmt'
-                         | do comp_stmt_for_loops while ( expr ) ; list_of_loop_stmt'
-                         | return return_stmt' list_of_loop_stmt'
-                         | break ; list_of_loop_stmt'
-                         | continue ; list_of_loop_stmt'
-                         | { list_of_loop_stmt } list_of_loop_stmt'
-      if_stmt_for_loop' -> ϵ
-                         | else loop_stmt
-           return_stmt' -> ;
-                         | expr ;
+          exec_stmt -> data_proc_stmt
+                     | ctrl_stmt
+                     | comp_stmt
+     data_proc_stmt -> give_stmt
+                     | func_call_stmt
+          give_stmt -> give_expr ;
+     func_call_stmt -> func_call ;
+          ctrl_stmt -> if_stmt
+                     | for_stmt
+                     | while_stmt
+                     | do_while_stmt
+                     | return_stmt
+          comp_stmt -> { stmt_list }
+          stmt_list -> stmt stmt_list'
+            if_stmt -> if ( expr ) stmt if_stmt'
+           for_stmt -> for ( expr ; expr ; expr ) loop_stmt
+         while_stmt -> while ( expr ) loop_stmt
+      do_while_stmt -> do loop_comp_stmt while ( expr ) ;
+          loop_stmt -> decl_stmt
+                     | loop_exec_stmt
+     loop_exec_stmt -> give_expr ;
+                     | func_call ;
+                     | loop_ctrl_stmt
+                     | loop_comp_stmt
+     loop_comp_stmt -> { loop_stmt_list }
+     loop_stmt_list -> decl_stmt loop_stmt_list'
+                     | give_expr ; loop_stmt_list'
+                     | func_call ; loop_stmt_list'
+                     | loop_ctrl_stmt loop_stmt_list'
+                     | { loop_stmt_list } loop_stmt_list'
+     loop_ctrl_stmt -> loop_if_stmt
+                     | for ( expr ; expr ; expr ) loop_stmt
+                     | while ( expr ) loop_stmt
+                     | do loop_comp_stmt while ( expr ) ;
+                     | return_stmt
+                     | break_stmt
+                     | continue_stmt
+       loop_if_stmt -> if ( expr ) loop_stmt loop_if_stmt'
+        return_stmt -> return return_stmt'
+         break_stmt -> break ;
+      continue_stmt -> continue ;
+         stmt_list' -> ϵ
+                     | stmt stmt_list'
+           if_stmt' -> ϵ
+                     | else stmt
+    loop_stmt_list' -> ϵ
+                     | decl_stmt loop_stmt_list'
+                     | give_expr ; loop_stmt_list'
+                     | func_call ; loop_stmt_list'
+                     | if ( expr ) loop_stmt loop_if_stmt' loop_stmt_list'
+                     | for ( expr ; expr ; expr ) loop_stmt loop_stmt_list'
+                     | while ( expr ) loop_stmt loop_stmt_list'
+                     | do loop_comp_stmt while ( expr ) ; loop_stmt_list'
+                     | return return_stmt' loop_stmt_list'
+                     | break ; loop_stmt_list'
+                     | continue ; loop_stmt_list'
+                     | { loop_stmt_list } loop_stmt_list'
+      loop_if_stmt' -> ϵ
+                     | else loop_stmt
+       return_stmt' -> ;
+                     | expr ;
+
     """
     def __init__(self):
         super().__init__()
@@ -432,9 +441,7 @@ class Match_exec_stmt(Match_base):
         elif self.func_func_call_stmt(iid):
             return True
 
-        self.i = 0
-        self.token = self.arr[self.i]
-        self.anls.clear()
+        self.reset_token()
         return False
 
     def func_give_stmt(self, parent):
@@ -465,29 +472,17 @@ class Match_exec_stmt(Match_base):
         iid = self.creat_node('ctrl_stmt', parent)
 
         if self.func_if_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_for_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_while_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_do_while_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_return_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
 
-        self.i = 0
-        self.token = self.arr[self.i]
-        self.anls.clear()
+        self.reset_token()
         return False
 
     def func_comp_stmt(self, parent):
@@ -502,9 +497,7 @@ class Match_exec_stmt(Match_base):
                         return True
                     return True
 
-        self.i = 0
-        self.token = self.arr[self.i]
-        self.anls.clear()
+        self.reset_token()
         return False
 
     def func_stmt_list(self, parent):
@@ -514,8 +507,6 @@ class Match_exec_stmt(Match_base):
             if self.get_next(iid) is None:
                 return True
             if self.func_stmt_list1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
                 return True
         return False
 
@@ -538,8 +529,6 @@ class Match_exec_stmt(Match_base):
                             if self.get_next(iid) is None:
                                 return True
                             if self.func_if_stmt1(iid):
-                                # if self.get_next(iid) is None:
-                                #     return True
                                 return True
         return False
 
@@ -571,8 +560,6 @@ class Match_exec_stmt(Match_base):
                                         if self.get_next(iid) is None:
                                             return True
                                         if self.func_loop_stmt(iid):
-                                            # if self.get_next(iid) is None:
-                                            #     return True
                                             return True
         return False
 
@@ -603,7 +590,7 @@ class Match_exec_stmt(Match_base):
         if self.token == 'do':
             if self.get_next(iid) is None:
                 return True
-            if self.func_comp_stmt_for_loops(iid):
+            if self.func_loop_comp_stmt(iid):
                 if self.token == 'while':
                     if self.get_next(iid) is None:
                         return True
@@ -630,64 +617,87 @@ class Match_exec_stmt(Match_base):
                 return True
             return True
         elif self.func_loop_exec_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
-            return True
-        elif self.func_comp_stmt_for_loops(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         return False
 
-    def func_comp_stmt_for_loops(self, parent):
-        iid = self.creat_node('comp_stmt_for_loops', parent)
+    def func_loop_exec_stmt(self, parent):
+        iid = self.creat_node('loop_exec_stmt', parent)
+
+        if self.is_g_expr(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                return True
+        elif self.is_func_call(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                return True
+        elif self.func_loop_ctrl_stmt(iid):
+            return True
+        elif self.func_loop_comp_stmt(iid):
+            return True
+        return False
+
+    def func_loop_comp_stmt(self, parent):
+        iid = self.creat_node('loop_comp_stmt', parent)
 
         if self.token == '{':
             if self.get_next(iid) is None:
                 return True
-            if self.func_list_of_loop_stmt(iid):
+            if self.func_loop_stmt_list(iid):
                 if self.token == '}':
                     if self.get_next(iid) is None:
                         return True
                     return True
         return False
 
-    def func_list_of_loop_stmt(self, parent):
-        iid = self.creat_node('list_of_loop_stmt', parent)
+    def func_loop_stmt_list(self, parent):
+        iid = self.creat_node('loop_stmt_list', parent)
 
         if self.is_decl_stmt(iid):
             if self.get_next(iid) is None:
                 return True
-            if self.func_list_of_loop_stmt1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
+            if self.loop_stmt_list1(iid):
                 return True
-        elif self.func_loop_exec_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
-            if self.func_list_of_loop_stmt1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
+        elif self.is_g_expr(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                if self.loop_stmt_list1(iid):
+                    return True
+        elif self.is_func_call(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                if self.loop_stmt_list1(iid):
+                    return True
+        elif self.func_loop_ctrl_stmt(iid):
+            if self.loop_stmt_list1(iid):
                 return True
         elif self.token == '{':
             if self.get_next(iid) is None:
                 return True
-            if self.func_list_of_loop_stmt(iid):
+            if self.func_loop_stmt_list(iid):
                 if self.token == '}':
                     if self.get_next(iid) is None:
                         return True
-                    if self.func_list_of_loop_stmt1(iid):
-                        # if self.get_next(iid) is None:
-                        #     return True
+                    if self.loop_stmt_list1(iid):
                         return True
         return False
 
-    def func_loop_exec_stmt(self, parent):
-        iid = self.creat_node('loop_exec_stmt', parent)
+    def func_loop_ctrl_stmt(self, parent):
+        iid = self.creat_node('loop_ctrl_stmt', parent)
 
-        if self.func_if_stmt_for_loop(iid):
-            # if self.get_next(iid) is None:
-            #     return True
+        if self.func_loop_if_stmt(iid):
             return True
         elif self.token == 'for':
             if self.get_next(iid) is None:
@@ -714,8 +724,6 @@ class Match_exec_stmt(Match_base):
                                         if self.get_next(iid) is None:
                                             return True
                                         if self.func_loop_stmt(iid):
-                                            # if self.get_next(iid) is None:
-                                            #     return True
                                             return True
         elif self.token == 'while':
             if self.get_next(iid) is None:
@@ -730,13 +738,11 @@ class Match_exec_stmt(Match_base):
                         if self.get_next(iid) is None:
                             return True
                         if self.func_loop_stmt(iid):
-                            # if self.get_next(iid) is None:
-                            #     return True
                             return True
         elif self.token == 'do':
             if self.get_next(iid) is None:
                 return True
-            if self.func_comp_stmt_for_loops(iid):
+            if self.func_loop_comp_stmt(iid):
                 if self.token == 'while':
                     if self.get_next(iid) is None:
                         return True
@@ -754,21 +760,15 @@ class Match_exec_stmt(Match_base):
                                         return True
                                     return True
         elif self.func_return_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_break_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         elif self.func_continue_stmt(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         return False
 
-    def func_if_stmt_for_loop(self, parent):
-        iid = self.creat_node('if_stmt_for_loop', parent)
+    def func_loop_if_stmt(self, parent):
+        iid = self.creat_node('loop_if_stmt', parent)
 
         if self.token == 'if':
             if self.get_next(iid) is None:
@@ -783,9 +783,7 @@ class Match_exec_stmt(Match_base):
                         if self.get_next(iid) is None:
                             return True
                         if self.func_loop_stmt(iid):
-                            if self.func_if_stmt_for_loop1(iid):
-                                # if self.get_next(iid) is None:
-                                #     return True
+                            if self.func_loop_if_stmt1(iid):
                                 return True
         return False
 
@@ -796,8 +794,6 @@ class Match_exec_stmt(Match_base):
             if self.get_next(iid) is None:
                 return True
             if self.func_return_stmt1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
                 return True
         return False
 
@@ -832,8 +828,6 @@ class Match_exec_stmt(Match_base):
             if self.get_next(iid) is None:
                 return True
             if self.func_stmt_list1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
                 return True
         return True
 
@@ -849,16 +843,30 @@ class Match_exec_stmt(Match_base):
                 return True
         return True
 
-    def func_list_of_loop_stmt1(self, parent):
+    def loop_stmt_list1(self, parent):
         iid = self.creat_node('list_of_loop_stmt1', parent)
 
         if self.is_decl_stmt(iid):
             if self.get_next(iid) is None:
                 return True
-            if self.func_list_of_loop_stmt1(iid):
-                # if self.get_next(iid) is None:
-                #     return True
+            if self.loop_stmt_list1(iid):
                 return True
+        elif self.is_g_expr(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                if self.loop_stmt_list1(iid):
+                    return True
+        elif self.is_func_call(iid):
+            if self.get_next(iid) is None:
+                return True
+            if self.token == ';':
+                if self.get_next(iid) is None:
+                    return True
+                if self.loop_stmt_list1(iid):
+                    return True
         elif self.token == 'if':
             if self.get_next(iid) is None:
                 return True
@@ -872,10 +880,8 @@ class Match_exec_stmt(Match_base):
                         if self.get_next(iid) is None:
                             return True
                         if self.func_loop_stmt(iid):
-                            if self.func_if_stmt_for_loop1(iid):
-                                if self.func_list_of_loop_stmt1(iid):
-                                    # if self.get_next(iid) is None:
-                                    #     return True
+                            if self.func_loop_if_stmt1(iid):
+                                if self.loop_stmt_list1(iid):
                                     return True
         elif self.token == 'for':
             if self.get_next(iid) is None:
@@ -902,9 +908,7 @@ class Match_exec_stmt(Match_base):
                                         if self.get_next(iid) is None:
                                             return True
                                         if self.func_loop_stmt(iid):
-                                            if self.func_list_of_loop_stmt1(iid):
-                                                # if self.get_next(iid) is None:
-                                                #     return True
+                                            if self.loop_stmt_list1(iid):
                                                 return True
         elif self.token == 'while':
             if self.get_next(iid) is None:
@@ -919,14 +923,12 @@ class Match_exec_stmt(Match_base):
                         if self.get_next(iid) is None:
                             return True
                         if self.func_loop_stmt(iid):
-                            if self.func_list_of_loop_stmt1(iid):
-                                # if self.get_next(iid) is None:
-                                #     return True
+                            if self.loop_stmt_list1(iid):
                                 return True
         elif self.token == 'do':
             if self.get_next(iid) is None:
                 return True
-            if self.func_comp_stmt_for_loops(iid):
+            if self.func_loop_comp_stmt(iid):
                 if self.token == 'while':
                     if self.get_next(iid) is None:
                         return True
@@ -940,17 +942,13 @@ class Match_exec_stmt(Match_base):
                                 if self.get_next(iid) is None:
                                     return True
                                 if self.token == ';':
-                                    if self.func_list_of_loop_stmt1(iid):
-                                        # if self.get_next(iid) is None:
-                                        #     return True
+                                    if self.loop_stmt_list1(iid):
                                         return True
         elif self.token == 'return':
             if self.get_next(iid) is None:
                 return True
             if self.func_return_stmt1(iid):
-                if self.func_list_of_loop_stmt1(iid):
-                    # if self.get_next(iid) is None:
-                    #     return True
+                if self.loop_stmt_list1(iid):
                     return True
         elif self.token == 'break':
             if self.get_next(iid) is None:
@@ -958,9 +956,7 @@ class Match_exec_stmt(Match_base):
             if self.token == ';':
                 if self.get_next(iid) is None:
                     return True
-                if self.func_list_of_loop_stmt1(iid):
-                    # if self.get_next(iid) is None:
-                    #     return True
+                if self.loop_stmt_list1(iid):
                     return True
         elif self.token == 'continue':
             if self.get_next(iid) is None:
@@ -968,32 +964,26 @@ class Match_exec_stmt(Match_base):
             if self.token == ';':
                 if self.get_next(iid) is None:
                     return True
-                if self.func_list_of_loop_stmt1(iid):
-                    # if self.get_next(iid) is None:
-                    #     return True
+                if self.loop_stmt_list1(iid):
                     return True
         elif self.token == '{':
             if self.get_next(iid) is None:
                 return True
-            if self.func_list_of_loop_stmt(iid):
+            if self.func_loop_stmt_list(iid):
                 if self.token == '}':
                     if self.get_next(iid) is None:
                         return True
-                    if self.func_list_of_loop_stmt1(iid):
-                        # if self.get_next(iid) is None:
-                        #     return True
+                    if self.loop_stmt_list1(iid):
                         return True
         return True
 
-    def func_if_stmt_for_loop1(self, parent):
+    def func_loop_if_stmt1(self, parent):
         iid = self.creat_node('if_stmt_for_loop1', parent)
 
         if self.token == 'else':
             if self.get_next(iid) is None:
                 return True
             if self.func_loop_stmt(iid):
-                # if self.get_next(iid) is None:
-                #     return True
                 return True
         return True
 
@@ -1014,62 +1004,68 @@ class Match_exec_stmt(Match_base):
         return False
 
     def is_g_expr(self, iid):
-        self.i = 0
+        # self.index = 0
         handler = Match_g_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_func_call(self, iid):
-        # TODO a_expr
-        return True
+        handler = Match_a_expr()
+        res = False
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
+            res, i, subtree = handler.run_export_func_call(False)
+            self.index += i
+            self.tree.paste(iid, subtree)
+        return res
 
     def is_stmt(self, iid):
         handler = Match_base_stmt()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_expr(self, iid):
         handler = Match_expr()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_decl_stmt(self, iid):
         handler = Match_base_stmt()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             # TODO 疑似<声明语句>应该为<语句>，书上错了
-            # res, i, subtree = handler.run_export_decl_stmt(False)
-            res, i, subtree = handler.run(False)
-            self.i += i
+            res, i, subtree = handler.run_export_decl_stmt(False)
+            # res, i, subtree = handler.run(False)
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def run_export_comp_stmt(self, flag):
         self.res = self.func_comp_stmt('root')
         if self.res is True:
-            if len(self.arr) > len(self.anls):
+            if len(self.token_list) > len(self.anls_proc):
                 self.error(2, 'unmatched characters')
                 if flag:
                     self.res = False
-        if self.i == 0:
-            self.i += 1
-        return self.res, self.i - 1, self.tree
+        if self.index == 0:
+            self.index += 1
+        return self.res, self.index - 1, self.tree
 
 
 class Match_func_stmt(Match_base):
@@ -1119,8 +1115,6 @@ class Match_func_stmt(Match_base):
         iid = self.creat_node('func_def_para_list', parent)
 
         if self.func_func_def_para(iid):
-            # if self.get_next(iid) is None:
-            #     return True
             return True
         return True
 
@@ -1134,8 +1128,6 @@ class Match_func_stmt(Match_base):
                 if self.get_next(iid) is None:
                     return True
                 if self.func_func_def_para1(iid):
-                    # if self.get_next(iid) is None:
-                    #     return True
                     return True
         return False
 
@@ -1157,10 +1149,10 @@ class Match_func_stmt(Match_base):
     def is_comp_stmt(self, iid):
         handler = Match_exec_stmt()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
@@ -1172,7 +1164,7 @@ class Match_func_stmt(Match_base):
 
 class Match_program_stmt(Match_base):
     """
-    <程序> -> <声明语句块> main() <复合语句> <函数块>
+    <程序> -> <声明语句块> int main() <复合语句> <函数块>
     <声明语句块> -> <声明语句> <声明语句块> | ϵ
     <函数块> -> <函数定义> <函数块> | ϵ
     =============================================================
@@ -1228,29 +1220,29 @@ class Match_program_stmt(Match_base):
 
     def is_comp_stmt(self, iid):
         handler = Match_exec_stmt()
-        handler.set_tokenList(self.arr[self.i:])
+        handler.set_tokenList(self.token_list[self.index:])
         res, i, subtree = handler.run_export_comp_stmt(False)
-        self.i += i
+        self.index += i
         self.tree.paste(iid, subtree)
         return res
 
     def is_decl_stmt(self, iid):
         handler = Match_base_stmt()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
     def is_func_def(self, iid):
         handler = Match_func_stmt()
         res = False
-        if self.i < len(self.arr):
-            handler.set_tokenList(self.arr[self.i:])
+        if self.index < len(self.token_list):
+            handler.set_tokenList(self.token_list[self.index:])
             res, i, subtree = handler.run(False)
-            self.i += i
+            self.index += i
             self.tree.paste(iid, subtree)
         return res
 
@@ -1258,18 +1250,23 @@ class Match_program_stmt(Match_base):
 def main_base():
     handler = Match_base_stmt()
     s = [
+        # 'int n = read ( 1 ) ;',
         # 'int i = 0 ;',
+        # 'i = 0 ;'
         # 'int i = 1 , j = 1 ;',
         # 'const int j = 0 ;',
         # 'int i = 1',
         # 'int i , j ; }',
         # '{ int i = 0 ; }',
-        # '{ int i = 0 ; int j = 0 ; }',
-        'int test_func ( int ) ;',
+        '{ int i = 0 ; int j = 0 ; }',
+        # 'int test_func ( int ) ;',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -1282,15 +1279,19 @@ def main_base():
 def main_exec():
     handler = Match_exec_stmt()
     s = [
-        # 'if ( i < 10 ) i = i + 1 ; else const int j = 0 ;',
-        # 'if ( i < 10 ) { i = i + 1 ; } else { const int j = 0 ; const int j = 0 ; }',
-        # 'if ( i < 10 ) { i = i + 1 ; } else { if ( i < 10 ) i = i + 1 ; else const int j = 0 ; }',
-        # 'for ( i = 0 ; i < 10 ; i + 1 ) { int j = 0 ; }',
-        'for ( i = 0 ; i < 10 ; i + 1 ) { if ( i < 10 ) i = i + 1 ; else { const int j = 0 ; break ; } }',
+        # 'break ; ',
+        # 'if ( i < 10 ) i = i + 1 ; else const int j = 0 ; ',
+        # 'if ( i < 10 ) { i = i + 1 ; } else { const int j = 0 ; const int j = 0 ; } ',
+        # 'if ( i < 10 ) { i = i + 1 ; } else { if ( i < 10 ) i = i + 1 ; else const int j = 0 ; } ',
+        # 'for ( i = 0 ; i < 10 ; i + 1 ) { int j = 0 ; } ',
+        'for ( i = 0 ; i < 10 ; i + 1 ) { int j = 0 ; if ( i < 10 ) int i = i + 1 ; else { const int j = 0 ; break ; } } ',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -1305,9 +1306,12 @@ def main_func():
     s = [
         'int test_func ( int para ) { int i = 0 ; return 0 ; }',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        handler.set_tokenList(item.split(' '))
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
@@ -1324,41 +1328,16 @@ def main_program():
         'int test_func ( int ) ; '
         'int main ( ) { '
         '  int i = 0 , j = 0 ; '
-        '  if ( i == 0 ) { '
-        '    while ( 1 ) { '
-        '      i = 1 ; '
-        '    } '
-        '  } '
-        '  for ( i = 0 ; i < 10 ; i = i + 1 ) { '
-        '    for ( j = 0 ; j < 10 ; j = j + 1 ) { '
-        '      j = j + 1 ; '
-        '    } '
-        '    if ( i < 10 ) { '
-        '      i = i + 1 ; '
-        '      if ( j > 5 ) { '
-        '        j = j + 2 ; '
-        '      } '
-        '    } '
-        '    else { '
-        '      const int j = 0 ; '
-        '      break ; '
-        '    } '
-        '  } '
-        '  return 0 ; '
-        '} '
-        'int test_func ( int para ) { '
-        '  int i = 0 ; '
+        '  int n = read ( 1 ) ;'
         '  return 0 ; '
         '} ',
     ]
+    lex_anal = Lex_analyzer()
     for item in s:
         print('Detected string: ', item)
-        temp = item.split(' ')
-        # print(temp)
-        while '' in temp:
-            temp.remove('')
-        print(temp)
-        handler.set_tokenList(temp)
+        lex_anal.set_text(item)
+        token_list = lex_anal.get_token()
+        handler.set_tokenList(token_list)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:

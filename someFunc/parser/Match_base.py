@@ -4,49 +4,59 @@ from treelib import Tree
 
 class Match_base:
     def __init__(self):
-        self.arr = None
-        self.i = 0
+        self.token_list = None
+        self.index = 0
         self.token = ''
         self.tree = Tree()
         # self.tree.create_node(tag='main', identifier='root')
-        self.anls = []
+        self.anls_proc = []
         self.res = True
-        self.info = ''
+        self.info = []
 
-    def set_tokenList(self, arr):
-        self.arr = arr
-        self.i = 0
-        self.token = self.arr[self.i]
+    def set_tokenList(self, token_list):
+        self.token_list = token_list
+        self.index = 0
+        self.token = self.token_list[self.index].val
         self.tree = Tree()
         # self.tree.create_node(tag='main', identifier='root')
-        self.anls = []
+        self.anls_proc = []
         self.res = True
-        self.info = ''
+        self.info = []
 
     def get_next(self, parent):
-        tmp = self.i - len(self.anls)
+        tmp = self.index - len(self.anls_proc)
         if tmp < 0:
             tmp = 0
-            self.i += 1
+            self.index += 1
         for i in range(tmp + 1):
-            if self.i - tmp + i < len(self.arr):
-                self.anls.append(self.arr[self.i - tmp + i])
+            if self.index - tmp + i < len(self.token_list):
+                self.anls_proc.append(self.token_list[self.index - tmp + i].val)
         if self.token is not None:
             self.tree.create_node(tag=self.token, identifier=str(uuid.uuid1()), parent=parent)
 
-        if self.i >= len(self.arr) - 1:
-            self.i += 1
+        if self.index >= len(self.token_list) - 1:
+            self.index += 1
             self.token = '#'
-            self.anls.append(self.token)
+            self.anls_proc.append(self.token)
             return self.token
         else:
-            self.i += 1
-            self.token = self.arr[self.i]
+            self.index += 1
+            self.token = self.token_list[self.index].val
             return self.token
 
+    def reset_token(self, re_num=-1):
+        if re_num == -1:
+            self.index = 0
+            self.anls_proc.clear()
+            self.token = self.token_list[self.index].val
+        else:
+            self.index -= re_num
+            for i in range(re_num):
+                self.anls_proc.pop(len(self.anls_proc)-1)
+            self.token = self.token_list[self.index].val
+
     def error(self, error, summer):
-        # self.res = False
-        self.info = 'error{}: {}'.format(error, summer)
+        self.info.append('error{}: {}'.format(error, summer))
 
     def creat_node(self, name, parent):
         iid = str(uuid.uuid1())
@@ -61,7 +71,8 @@ class Match_base:
 
     def is_var(self):
         res = self.token.isidentifier()
-        if self.token in {"void", "main", "short", "long", "int", "double", "float", "while", "if", "else", "for", "break", "return"}:
+        if self.token in {"void", "main", "short", "long", "int", "double", "float", "while", "if", "else", "for",
+                          "break", "return"}:
             res = False
         return res
 
@@ -71,10 +82,10 @@ class Match_base:
     def run(self, flag):
         self.res = self.func_main('root')
         if self.res is True:
-            if len(self.arr) > len(self.anls):
+            if len(self.token_list) > len(self.anls_proc):
                 self.error(2, 'unmatched characters')
                 if flag:
                     self.res = False
-        if self.i == 0:
-            self.i += 1
-        return self.res, self.i - 1, self.tree
+        if self.index == 0:
+            self.index += 1
+        return self.res, self.index - 1, self.tree
