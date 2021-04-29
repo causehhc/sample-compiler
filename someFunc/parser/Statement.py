@@ -287,7 +287,7 @@ class Match_base_stmt(Match_base):
     def is_exec_stmt(self, iid):
         handler = Match_exec_stmt()
         handler.set_tokenList(self.token_list[self.index:])
-        res, i, subtree = handler.run(False)
+        res, i, subtree, _ = handler.run(False)
         self.index += i
         self.tree.paste(iid, subtree)
         return res
@@ -295,7 +295,7 @@ class Match_base_stmt(Match_base):
     def is_expr(self, iid):
         handler = Match_expr()
         handler.set_tokenList(self.token_list[self.index:])
-        res, i, subtree = handler.run(False)
+        res, i, subtree, _ = handler.run(False)
         self.index += i
         self.tree.paste(iid, subtree)
         return res
@@ -304,12 +304,15 @@ class Match_base_stmt(Match_base):
         self.res = self.func_decl_stmt('root')
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
-                self.error(2, 'unmatched characters')
+                self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
+                                                                              self.token_node.val,
+                                                                              self.token_node.row,
+                                                                              self.token_node.col)
                 if flag:
                     self.res = False
         if self.index == 0:
             self.index += 1
-        return self.res, self.index - 1, self.tree
+        return self.res, self.index - 1, self.tree, self.info
 
 
 class Match_exec_stmt(Match_base):
@@ -1009,7 +1012,7 @@ class Match_exec_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1019,7 +1022,7 @@ class Match_exec_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run_export_func_call(False)
+            res, i, subtree, _ = handler.run_export_func_call(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1029,7 +1032,7 @@ class Match_exec_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1039,7 +1042,7 @@ class Match_exec_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1050,7 +1053,7 @@ class Match_exec_stmt(Match_base):
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
             # TODO 疑似<声明语句>应该为<语句>，书上错了
-            res, i, subtree = handler.run_export_decl_stmt(False)
+            res, i, subtree, _ = handler.run_export_decl_stmt(False)
             # res, i, subtree = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
@@ -1060,12 +1063,15 @@ class Match_exec_stmt(Match_base):
         self.res = self.func_comp_stmt('root')
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
-                self.error(2, 'unmatched characters')
+                self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
+                                                                              self.token_node.val,
+                                                                              self.token_node.row,
+                                                                              self.token_node.col)
                 if flag:
                     self.res = False
         if self.index == 0:
             self.index += 1
-        return self.res, self.index - 1, self.tree
+        return self.res, self.index - 1, self.tree, self.info
 
 
 class Match_func_stmt(Match_base):
@@ -1151,7 +1157,7 @@ class Match_func_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1221,7 +1227,7 @@ class Match_program_stmt(Match_base):
     def is_comp_stmt(self, iid):
         handler = Match_exec_stmt()
         handler.set_tokenList(self.token_list[self.index:])
-        res, i, subtree = handler.run_export_comp_stmt(False)
+        res, i, subtree, _ = handler.run_export_comp_stmt(False)
         self.index += i
         self.tree.paste(iid, subtree)
         return res
@@ -1231,7 +1237,7 @@ class Match_program_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1241,7 +1247,7 @@ class Match_program_stmt(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, _ = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
         return res
@@ -1263,15 +1269,13 @@ def main_base():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -1288,15 +1292,13 @@ def main_exec():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -1308,15 +1310,13 @@ def main_func():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -1334,15 +1334,13 @@ def main_program():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 

@@ -10,6 +10,7 @@ class Lex_analyzer:
     def __init__(self):
         self.text = None
         self.token = []
+        self.info = []
         self.idx = 0
         self.row_idx = 0
         self.col_idx = 0
@@ -17,6 +18,7 @@ class Lex_analyzer:
     def set_text(self, text):
         self.text = text
         self.token = []
+        self.info = []
         self.idx = 0
         self.row_idx = 0
         self.col_idx = 0
@@ -141,7 +143,8 @@ class Lex_analyzer:
                         if ch == '/':
                             ch = self.get_next()
                         else:
-                            print('lex error: Incorrect comment format')
+                            # print('lex error: Incorrect comment format')
+                            self.info.append('lex error: Incorrect comment format')
                     else:
                         self.token.append(TokenNode(ch, '3', self.row_idx, self.col_idx))
                 else:
@@ -149,12 +152,15 @@ class Lex_analyzer:
                     ch = self.get_next()
             else:  # 跳过当前单词
                 if ch not in ['\n', '\t', ' ']:
-                    print('lex error: Unrecognized character {}'.format(ch))
+                    # print('lex error: Unrecognized character {}'.format(ch))
+                    self.info.append('lex error: Unrecognized character {}'.format(ch))
                 ch = self.get_next()
 
-    def get_token(self):
+    def get_token_info(self):
         self.run()
-        return self.token
+        if len(self.info) == 0:
+            self.info.append('all ok')
+        return self.token, self.info
 
 
 def main():
@@ -162,7 +168,7 @@ def main():
     # print(text)
     anal = Lex_analyzer()
     anal.set_text(text)
-    token_list = anal.get_token()
+    token_list, info_list = anal.get_token_info()
     for item in token_list:
         print(item.val)
 

@@ -4,10 +4,11 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
+
+from someFunc.lexical.Automata import Lex_analyzer
+from someFunc.parser.Statement import Match_program_stmt
 from ui import Ui_MainWindow
 from subui import Ui_rndm
-from someFunc.LexAnls_Hand import Control
-from someFunc.LexAnls import LexAnls
 
 
 class MyMainForm(QMainWindow, Ui_MainWindow):
@@ -15,13 +16,10 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.ct = Control()
-        self.anls = LexAnls()
-
         self.windowTitle = "廖语言编译器威力加强无敌版V99.9（国产正版）"
         self.openedFileName = ''
         self.anlsInfo = ''
-        self.token = None
+        self.token_list = None
 
         self.statusBar.showMessage("就绪")
         self.setWindowTitle(self.windowTitle)
@@ -115,18 +113,21 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
     def LexAnls(self):
         content = self.textEditMain.toPlainText()
         # TODO
-        self.token = self.anls.find_all_exec(content)
-        result = ''
-        info = ''
-        for item in self.token:
-            if item[0] == 'NoneType':
-                info += 'error\t{}\n'.format(item[1])
-            else:
-                result += '{}\t{}\n'.format(item[0], item[1])
+        lex_anal = Lex_analyzer()
+        lex_anal.set_text(content)
+        token_list, info_list = lex_anal.get_token_info()
+        self.token_list = token_list
 
-        self.anlsInfo = info
+        res = ''
+        for item in token_list:
+            token_str = '{}\t{}\t{}\t{}\t{}'.format(token_list.index(item), item.val, item.type, item.row, item.col)
+            res += '{}\n'.format(token_str)
+        self.anlsInfo = ''
+        for item in info_list:
+            self.anlsInfo += '{}\n'.format(item)
+
         self.textEditRes.clear()
-        self.textEditRes.setText(result)
+        self.textEditRes.setText(res)
         self.update_symbol_sta()
 
     def rndm(self):
@@ -136,11 +137,18 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
     def parser(self):
         content = self.textEditMain.toPlainText()
         # TODO
-        content = content.replace(' ', 'sb')
-        self.anlsInfo = "try this shit2"
+        parser_anal = Match_program_stmt()
+        parser_anal.set_tokenList(self.token_list)
+        res, idx, tree, error_list = parser_anal.run(True)
+        res_info = parser_anal.tree.show(stdout=False)
+        print(res)
+
+        self.anlsInfo = ''
+        for item in error_list:
+            self.anlsInfo += '{}\n'.format(item)
 
         self.textEditRes.clear()
-        self.textEditRes.setText(content)
+        self.textEditRes.setText(res_info)
         self.update_symbol_sta()
 
     # Symbol

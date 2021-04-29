@@ -31,6 +31,7 @@ class Match_expr(Match_base):
             if self.get_next(iid) is None:
                 return True
             return True
+
         return False
 
     def is_a_expr(self, iid):
@@ -39,9 +40,10 @@ class Match_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
     def is_r_expr(self, iid):
@@ -50,9 +52,10 @@ class Match_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
     def is_b_expr(self, iid):
@@ -61,20 +64,21 @@ class Match_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
     def is_g_expr(self, iid):
-        # self.index = 0
         handler = Match_g_expr()
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
 
@@ -161,12 +165,6 @@ class Match_a_expr(Match_base):
             return True
         elif self.func_a_const(iid):
             return True
-        # elif self.func_a_const(iid):
-        #     return True
-        # elif self.func_a_var(iid):
-        #     return True
-        # elif self.func_func_call(iid):
-        #     return True
         return False
 
     def func_a_const(self, parent):
@@ -288,12 +286,15 @@ class Match_a_expr(Match_base):
         self.res = self.func_func_call('root')
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
-                self.error(2, 'unmatched characters')
+                self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
+                                                                              self.token_node.val,
+                                                                              self.token_node.row,
+                                                                              self.token_node.col)
                 if flag:
                     self.res = False
         if self.index == 0:
             self.index += 1
-        return self.res, self.index - 1, self.tree
+        return self.res, self.index - 1, self.tree, self.info
 
 
 class Match_r_expr(Match_base):
@@ -340,9 +341,10 @@ class Match_r_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
 
@@ -427,9 +429,10 @@ class Match_b_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
     def is_r_expr(self, iid):
@@ -437,9 +440,10 @@ class Match_b_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
 
@@ -473,9 +477,10 @@ class Match_g_expr(Match_base):
         res = False
         if self.index < len(self.token_list):
             handler.set_tokenList(self.token_list[self.index:])
-            res, i, subtree = handler.run(False)
+            res, i, subtree, info = handler.run(False)
             self.index += i
             self.tree.paste(iid, subtree)
+            self.info = info
         return res
 
 
@@ -491,15 +496,13 @@ def main_expr():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -519,15 +522,13 @@ def main_a_expr():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -541,15 +542,13 @@ def main_r_expr():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -564,15 +563,13 @@ def main_b_expr():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 
@@ -584,15 +581,13 @@ def main_g_expr():
     ]
     lex_anal = Lex_analyzer()
     for item in s:
-        print('Detected string: ', item)
+        print(item)
         lex_anal.set_text(item)
-        token_list = lex_anal.get_token()
+        token_list, info_list = lex_anal.get_token_info()
         handler.set_tokenList(token_list)
-        res, idx, tree = handler.run(True)
-        print('Compliance with the rules: ', res)
-        if res is False:
-            print('error info:', handler.info)
-            print('error idx:', idx + 1)
+        res, idx, tree, error_list = handler.run(True)
+        print(res)
+        print(error_list)
         # handler.tree.show()
         print()
 

@@ -43,7 +43,7 @@ sample-compiler  # 根目录
 源程序:
 ![avatar](pic/3.jpg)
 ![avatar](pic/4.jpg)
-由此生成的巨大的语法树...
+由此生成的巨大的语法树...  
 ```text
 program
 ├── (
@@ -69,3 +69,4 @@ program
 │   │   │   │           │   │           │   └── b_item
 ...还有剩下90%就不放了，电脑太卡了...
 ```
+![avatar](pic/5.jpg)
