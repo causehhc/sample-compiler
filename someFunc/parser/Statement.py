@@ -102,6 +102,10 @@ class Match_base_stmt(Match_base):
             return True
         elif self.func_var_decl(iid):
             return True
+
+        self.i = 0
+        self.token = self.arr[self.i]
+        self.anls.clear()
         return False
 
     def func_const_decl(self, parent):
@@ -1254,13 +1258,14 @@ class Match_program_stmt(Match_base):
 def main_base():
     handler = Match_base_stmt()
     s = [
-        'int i = 0 ;',
-        'int i = 1 , j = 1 ;',
-        'const int j = 0 ;',
-        'int i = 1',
-        'int i , j ; }',
-        '{ int i = 0 ; }',
-        '{ int i = 0 ; int j = 0 ; }',
+        # 'int i = 0 ;',
+        # 'int i = 1 , j = 1 ;',
+        # 'const int j = 0 ;',
+        # 'int i = 1',
+        # 'int i , j ; }',
+        # '{ int i = 0 ; }',
+        # '{ int i = 0 ; int j = 0 ; }',
+        'int test_func ( int ) ;',
     ]
     for item in s:
         print('Detected string: ', item)
@@ -1316,11 +1321,24 @@ def main_program():
     handler = Match_program_stmt()
     s = [
         'int a = 1 ; '
+        'int test_func ( int ) ; '
         'int main ( ) { '
-        '  int i = 0 ; '
-        '  for ( i = 0 ; i < 10 ; i + 1 ) { '
-        '    if ( i < 10 ) '
+        '  int i = 0 , j = 0 ; '
+        '  if ( i == 0 ) { '
+        '    while ( 1 ) { '
+        '      i = 1 ; '
+        '    } '
+        '  } '
+        '  for ( i = 0 ; i < 10 ; i = i + 1 ) { '
+        '    for ( j = 0 ; j < 10 ; j = j + 1 ) { '
+        '      j = j + 1 ; '
+        '    } '
+        '    if ( i < 10 ) { '
         '      i = i + 1 ; '
+        '      if ( j > 5 ) { '
+        '        j = j + 2 ; '
+        '      } '
+        '    } '
         '    else { '
         '      const int j = 0 ; '
         '      break ; '
@@ -1339,14 +1357,14 @@ def main_program():
         # print(temp)
         while '' in temp:
             temp.remove('')
-        # print(temp)
+        print(temp)
         handler.set_tokenList(temp)
         res, idx, tree = handler.run(True)
         print('Compliance with the rules: ', res)
         if res is False:
             print('error info:', handler.info)
             print('error idx:', idx + 1)
-        handler.tree.show()
+        # handler.tree.show()
         print()
 
 
