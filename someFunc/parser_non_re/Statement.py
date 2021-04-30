@@ -148,9 +148,11 @@ class Parser_analyzer:
                     self.stack_anls.extend(temp)
             symbol = self.stack_anls.pop(-1)
 
+        self.ans_show()
+        if len(self.err_info) == 0:
+            print('match compete!')
         for item in self.err_info:
             print(item)
-        # self.ans_show()
 
 
 def main():
