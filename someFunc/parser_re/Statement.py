@@ -1,6 +1,6 @@
 from someFunc.lexical.Automata import Lex_analyzer
-from someFunc.parser.Match_base import Match_base
-from someFunc.parser.Expression import Match_expr, Match_g_expr, Match_a_expr
+from someFunc.parser_re.Match_base import Match_base
+from someFunc.parser_re.Expression import Match_expr, Match_g_expr, Match_a_expr
 
 
 class Match_base_stmt(Match_base):

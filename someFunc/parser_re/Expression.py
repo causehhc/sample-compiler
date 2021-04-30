@@ -1,5 +1,5 @@
 from someFunc.lexical.Automata import Lex_analyzer
-from someFunc.parser.Match_base import Match_base
+from someFunc.parser_re.Match_base import Match_base
 
 
 class Match_expr(Match_base):

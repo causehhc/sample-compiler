@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
 
 from someFunc.lexical.Automata import Lex_analyzer
-from someFunc.parser.Statement import Match_program_stmt
+from someFunc.parser_re.Statement import Match_program_stmt
 from ui import Ui_MainWindow
 from subui import Ui_rndm
 
