@@ -1,6 +1,6 @@
 from someFunc.lexical.Automata import Lex_analyzer
-from someFunc.parser_non_re.Grammar import Parser_analyzer
-from someFunc.parser_re.Statement import Match_program_stmt
+from someFunc.parser.forecastTable.Grammar import Parser_analyzer
+from someFunc.parser.recursiveDescent.Statement import Match_program_stmt
 
 
 def create_dotPic(parser_anal):
@@ -40,8 +40,8 @@ def main_non_re():
     lex_anal.set_text(text)
     token_list, info_list = lex_anal.get_token_info()
 
-    path1 = './parser_non_re/grammer_LL(1).txt'
-    path2 = './parser_non_re/ff_set.txt'
+    path1 = './forecastTable/grammer_LL(1).txt'
+    path2 = './forecastTable/ff_set.txt'
     parser_anal = Parser_analyzer()
     parser_anal.load_analyzer(path1, path2)
     parser_anal.load_stack(token_list)

@@ -1,9 +1,3 @@
-import uuid
-from treelib import Tree
-
-from someFunc.parser_re.Expression import Match_expr
-
-
 class Parser_analyzer:
     """
     语句LL(1)文法：
@@ -105,58 +99,6 @@ class Parser_analyzer:
                         for n in range(len(self.Vn)):
                             self.table[n].append('')
                     self.table[self.Vn.index(item)][self.Vt.index(non)] = 'eps'
-
-        # for item in self.Vn:
-        #     item_prod = prod_set[item]
-        #     item_ff = ff_set[item]
-        #     for temp_prod in item_prod:
-        #         if item == 'program':
-        #             print('nn')
-        #         temp_shit = temp_prod.split(' ')
-        #         temp_first = temp_shit[0]
-        #         if temp_first in ff_set:
-        #             temp_prod_ff = ff_set[temp_first]
-        #         else:
-        #             eps_flag = 'false'
-        #             eps_fo_set = []
-        #             if temp_first == 'eps':
-        #                 eps_flag = 'true'
-        #                 if len(temp_shit) > 1:
-        #                     for i in range(1, len(temp_shit)):
-        #                         eps_fo_set.extend(ff_set[temp_shit[i]]['fi_set'])
-        #                         if 'eps' not in ff_set[temp_shit[i]]['fi_set']:
-        #                             break
-        #             temp_prod_ff = {
-        #                 'eps_flag': eps_flag,
-        #                 'fi_set': [temp_first],
-        #                 'fo_set': eps_fo_set
-        #             }
-        #
-        #         select_set = temp_prod_ff['fi_set']
-        #         if 'eps' in select_set:
-        #             select_set.remove('eps')
-        #         for non in select_set:
-        #             if non not in self.Vt:
-        #                 self.Vt.append(non)
-        #                 for n in range(len(self.Vn)):
-        #                     self.table[n].append('')
-        #             self.table[self.Vn.index(item)][self.Vt.index(non)] = temp_prod
-        #         if item_ff['eps_flag'] == 'true':
-        #             select_set = item_ff['fo_set']+temp_prod_ff['fo_set']
-        #             while True:
-        #                 if 'eps' in select_set:
-        #                     select_set.remove('eps')
-        #                 else:
-        #                     break
-        #             for non in select_set:
-        #                 if non not in self.Vt:
-        #                     self.Vt.append(non)
-        #                     for n in range(len(self.Vn)):
-        #                         self.table[n].append('')
-        #                 if non not in temp_prod_ff['fo_set']:
-        #                     self.table[self.Vn.index(item)][self.Vt.index(non)] = 'eps'
-        #                 else:
-        #                     self.table[self.Vn.index(item)][self.Vt.index(non)] = temp_prod
 
     def load_stack(self, token_list):
         self.stack_anls = []
