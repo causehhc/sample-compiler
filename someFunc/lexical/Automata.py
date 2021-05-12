@@ -187,7 +187,7 @@ def main():
     anal.set_text(text)
     token_list, info_list = anal.get_token_info()
     for item in token_list:
-        print(item.val)
+        print(item)
 
 
 if __name__ == '__main__':

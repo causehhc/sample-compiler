@@ -40,7 +40,7 @@ class SMC_analyzer(Parser_analyzer):
             if log:
                 print()
 
-        self.ans_show()
+        # self.ans_show()
         if len(self.err_info) == 0:
             print('match compete!')
         for item in self.err_info:
