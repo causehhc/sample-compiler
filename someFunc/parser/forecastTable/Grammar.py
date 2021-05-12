@@ -152,14 +152,14 @@ class Parser_analyzer:
                     print('\t*ERROR: {}\t<-\t{}'.format(symbol, toke))
                     self.err_info.append(
                         "row: {}, col: {}, token: '{}' cont match '{}'\n".format(toke.row, toke.col, toke, symbol))
-                elif table_item[0] != 'eps':
-                    temp = list(reversed(table_item))
-                    self.stack_anls.extend(temp)
-                else:
+                elif table_item[0] == 'eps':
                     if len(table_item) > 1:
                         temp = list(reversed(table_item))
                         self.stack_anls.extend(temp)
                         self.stack_anls.pop(-1)
+                else:
+                    temp = list(reversed(table_item))
+                    self.stack_anls.extend(temp)
             symbol = self.stack_anls.pop(-1)
             if log:
                 print()

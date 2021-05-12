@@ -1,6 +1,7 @@
 from someFunc.lexical.Automata import Lex_analyzer
 from someFunc.parser.forecastTable.Grammar import Parser_analyzer
 from someFunc.parser.recursiveDescent.Statement import Match_program_stmt
+from someFunc.semanticAndMidCode.GrammaticalGuidance import SMC_analyzer
 
 
 def create_dotPic(parser_anal):
@@ -12,7 +13,11 @@ def create_dotPic(parser_anal):
     dot.render('{}/tree'.format(root_dir), format='png')
 
 
-def main_re():
+def main_rd():
+    """
+    递归下降
+    :return:
+    """
     # text = open('./input.c', 'r', encoding='utf-8').read()
     text = open('./testfiles/test1.txt', 'r', encoding='utf-8').read()
 
@@ -32,7 +37,11 @@ def main_re():
     # create_dotPic(parser_anal)
 
 
-def main_non_re():
+def main_ft():
+    """
+    预测分析
+    :return:
+    """
     text = open('./input.c', 'r', encoding='utf-8').read()
     # text = open('./testfiles/test9.txt', 'r', encoding='utf-8').read()
 
@@ -49,6 +58,28 @@ def main_non_re():
     parser_anal.run(log=True)
 
 
+def main_ft_SMC():
+    """
+    预测分析+词法分析（生成中间代码）
+    :return:
+    """
+    text = open('./input_temp.c', 'r', encoding='utf-8').read()
+    # text = open('./testfiles/test9.txt', 'r', encoding='utf-8').read()
+
+    lex_anal = Lex_analyzer()
+    lex_anal.set_text(text)
+    token_list, info_list = lex_anal.get_token_info()
+
+    path1 = 'parser/forecastTable/grammer_LL(1).txt'
+    path2 = 'parser/forecastTable/ff_set.txt'
+    SMC_anal = SMC_analyzer()
+    SMC_anal.load_analyzer(path1, path2)
+    SMC_anal.load_stack(token_list)
+    # parser_anal.table_show()
+    SMC_anal.run(log=True)
+
+
 if __name__ == '__main__':
     # main_re()
-    main_non_re()
+    # main_ft()
+    main_ft_SMC()
