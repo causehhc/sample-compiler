@@ -69,6 +69,8 @@ def main_ft_SMC():
     lex_anal = Lex_analyzer()
     lex_anal.set_text(text)
     token_list, info_list = lex_anal.get_token_info()
+    for item in token_list:
+        print(item)
 
     path1 = 'parser/forecastTable/grammer_LL(1).txt'
     path2 = 'parser/forecastTable/ff_set.txt'
