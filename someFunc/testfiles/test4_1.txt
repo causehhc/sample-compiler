@@ -1,6 +1,6 @@
 //
 
-int main(){
+int_t main(){
 
     int N = read() ;
     int count=0,nprime=0,i,j;

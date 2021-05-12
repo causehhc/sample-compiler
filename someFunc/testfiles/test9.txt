@@ -1,6 +1,6 @@
 //
 int factor(int);
-int main()
+int_t main()
 
 {
 

@@ -1,0 +1,376 @@
+                 stmt -> decl_stmt
+                       | exec_stmt
+            decl_stmt -> float decl_stmt'''
+                       | char decl_stmt''
+                       | int decl_stmt'
+                       | const_decl
+                       | void var ( func_decl_para_list ) ;
+           const_decl -> const const_type const_decl_table
+           const_type -> int
+                       | char
+                       | float
+     const_decl_table -> var = num const_decl_table'
+       var_decl_table -> sin_var_decl var_decl_table'
+         sin_var_decl -> var sin_var_decl'
+  func_decl_para_list -> func_decl_para
+                       | eps
+       func_decl_para -> float func_decl_para'''
+                       | char func_decl_para''
+                       | int func_decl_para'
+            exec_stmt -> data_proc_stmt
+                       | ctrl_stmt
+                       | comp_stmt
+       data_proc_stmt -> var data_proc_stmt'
+            give_stmt -> var = expr ;
+       func_call_stmt -> func_call ;
+            func_call -> var ( args_list )
+            args_list -> args
+                       | eps
+                 args -> expr args'
+            ctrl_stmt -> if ( expr ) stmt ctrl_stmt'
+                       | for_stmt
+                       | while_stmt
+                       | do_while_stmt
+                       | return_stmt
+            comp_stmt -> { stmt_list }
+            stmt_list -> if ( expr ) stmt stmt_list''''
+                       | var stmt_list''
+                       | float decl_stmt''' stmt_list'
+                       | char decl_stmt'' stmt_list'
+                       | int decl_stmt' stmt_list'
+                       | const const_type const_decl_table stmt_list'
+                       | void var ( func_decl_para_list ) ; stmt_list'
+                       | for_stmt stmt_list'
+                       | while_stmt stmt_list'
+                       | do_while_stmt stmt_list'
+                       | return_stmt stmt_list'
+                       | { stmt_list } stmt_list'
+             for_stmt -> for ( expr ; expr ; expr ) loop_stmt
+           while_stmt -> while ( expr ) loop_stmt
+        do_while_stmt -> do loop_comp_stmt while ( expr ) ;
+            loop_stmt -> float decl_stmt'''
+                       | char decl_stmt''
+                       | int decl_stmt'
+                       | const const_type const_decl_table
+                       | void var ( func_decl_para_list ) ;
+                       | loop_exec_stmt
+       loop_exec_stmt -> var loop_exec_stmt'
+                       | loop_ctrl_stmt
+                       | loop_comp_stmt
+       loop_comp_stmt -> { loop_stmt_list }
+       loop_stmt_list -> var loop_stmt_list''
+                       | float decl_stmt''' loop_stmt_list'
+                       | char decl_stmt'' loop_stmt_list'
+                       | int decl_stmt' loop_stmt_list'
+                       | const const_type const_decl_table loop_stmt_list'
+                       | void var ( func_decl_para_list ) ; loop_stmt_list'
+                       | loop_ctrl_stmt loop_stmt_list'
+                       | { loop_stmt_list } loop_stmt_list'
+       loop_ctrl_stmt -> loop_if_stmt
+                       | for ( expr ; expr ; expr ) loop_stmt
+                       | while ( expr ) loop_stmt
+                       | do loop_comp_stmt while ( expr ) ;
+                       | return_stmt
+                       | break_stmt
+                       | continue_stmt
+         loop_if_stmt -> if ( expr ) loop_stmt loop_if_stmt'
+          return_stmt -> return return_stmt'
+           break_stmt -> break ;
+        continue_stmt -> continue ;
+             func_def -> int var ( func_def_para_list ) comp_stmt
+                       | char var ( func_def_para_list ) comp_stmt
+                       | float var ( func_def_para_list ) comp_stmt
+                       | void var ( func_def_para_list ) comp_stmt
+   func_def_para_list -> func_def_para
+                       | eps
+        func_def_para -> float var func_def_para'''
+                       | char var func_def_para''
+                       | int var func_def_para'
+              program -> decl_stmt_block int_t main ( ) comp_stmt func_block
+      decl_stmt_block -> float decl_stmt''' decl_stmt_block
+                       | char decl_stmt'' decl_stmt_block
+                       | int decl_stmt' decl_stmt_block
+                       | const const_type const_decl_table decl_stmt_block
+                       | void var ( func_decl_para_list ) ; decl_stmt_block
+                       | eps
+           func_block -> int var ( func_def_para_list ) comp_stmt func_block
+                       | char var ( func_def_para_list ) comp_stmt func_block
+                       | float var ( func_def_para_list ) comp_stmt func_block
+                       | void var ( func_def_para_list ) comp_stmt func_block
+                       | eps
+           decl_stmt' -> var decl_stmt''''
+          decl_stmt'' -> var decl_stmt'''''
+         decl_stmt''' -> var decl_stmt''''''
+    const_decl_table' -> ;
+                       | , const_decl_table
+      var_decl_table' -> ;
+                       | , var_decl_table
+        sin_var_decl' -> eps
+                       | = expr
+      func_decl_para' -> eps
+                       | , func_decl_para
+     func_decl_para'' -> eps
+                       | , func_decl_para
+    func_decl_para''' -> eps
+                       | , func_decl_para
+           stmt_list' -> if ( expr ) stmt stmt_list'''''
+                       | var stmt_list'''
+                       | eps
+                       | float decl_stmt''' stmt_list'
+                       | char decl_stmt'' stmt_list'
+                       | int decl_stmt' stmt_list'
+                       | const const_type const_decl_table stmt_list'
+                       | void var ( func_decl_para_list ) ; stmt_list'
+                       | for ( expr ; expr ; expr ) loop_stmt stmt_list'
+                       | while ( expr ) loop_stmt stmt_list'
+                       | do loop_comp_stmt while ( expr ) ; stmt_list'
+                       | return return_stmt' stmt_list'
+                       | { stmt_list } stmt_list'
+      loop_stmt_list' -> if ( expr ) loop_stmt loop_stmt_list''''
+                       | var loop_stmt_list'''
+                       | eps
+                       | float decl_stmt''' loop_stmt_list'
+                       | char decl_stmt'' loop_stmt_list'
+                       | int decl_stmt' loop_stmt_list'
+                       | const const_type const_decl_table loop_stmt_list'
+                       | void var ( func_decl_para_list ) ; loop_stmt_list'
+                       | for ( expr ; expr ; expr ) loop_stmt loop_stmt_list'
+                       | while ( expr ) loop_stmt loop_stmt_list'
+                       | do loop_comp_stmt while ( expr ) ; loop_stmt_list'
+                       | return return_stmt' loop_stmt_list'
+                       | break ; loop_stmt_list'
+                       | continue ; loop_stmt_list'
+                       | { loop_stmt_list } loop_stmt_list'
+         return_stmt' -> ;
+                       | expr ;
+       func_def_para' -> eps
+                       | , func_def_para
+      func_def_para'' -> eps
+                       | , func_def_para
+     func_def_para''' -> eps
+                       | , func_def_para
+        decl_stmt'''' -> ;
+                       | , var_decl_table
+                       | = expr var_decl_table'
+                       | ( func_decl_para_list ) ;
+       decl_stmt''''' -> ;
+                       | , var_decl_table
+                       | = expr var_decl_table'
+                       | ( func_decl_para_list ) ;
+      decl_stmt'''''' -> ;
+                       | , var_decl_table
+                       | = expr var_decl_table'
+                       | ( func_decl_para_list ) ;
+                args' -> eps
+                       | , args
+          stmt_list'' -> = expr ; stmt_list'
+                       | ( args_list ) ; stmt_list'
+      loop_exec_stmt' -> = expr ;
+                       | ( args_list ) ;
+     loop_stmt_list'' -> = expr ; loop_stmt_list'
+                       | ( args_list ) ; loop_stmt_list'
+         stmt_list''' -> = expr ; stmt_list'
+                       | ( args_list ) ; stmt_list'
+    loop_stmt_list''' -> = expr ; loop_stmt_list'
+                       | ( args_list ) ; loop_stmt_list'
+      data_proc_stmt' -> = expr ;
+                       | ( args_list ) ;
+                 expr -> var expr'''''''''
+                       | num a_item'' a_expr'' expr''''''''
+                       | ( a_expr ) a_item'' a_expr'' expr''''
+                       | ! b_expr b_item' b_expr'
+               a_expr -> a_item a_expr''
+               a_item -> a_factor a_item''
+             a_factor -> var a_factor'
+                       | ( a_expr )
+                       | num
+               r_expr -> var r_expr'
+                       | ( a_expr ) a_item'' a_expr'' r_op a_expr
+                       | num a_item'' a_expr'' r_op a_expr
+                 r_op -> >
+                       | <
+                       | >=
+                       | <=
+                       | ==
+                       | !=
+               b_expr -> b_item b_expr'
+               b_item -> b_factor b_item'
+             b_factor -> var b_factor'''''
+                       | num a_item'' a_expr'' b_factor'''
+                       | ( a_expr ) a_item'' a_expr'' b_factor''
+                       | ! b_expr
+               g_expr -> var = expr
+              a_expr' -> + a_item
+                       | - a_item
+              a_item' -> * a_factor
+                       | / a_factor
+                       | % a_factor
+             a_expr'' -> + a_item a_expr''
+                       | - a_item a_expr''
+                       | eps
+             a_item'' -> * a_factor a_item''
+                       | / a_factor a_item''
+                       | % a_factor a_item''
+                       | eps
+              b_expr' -> || b_item b_expr'
+                       | eps
+              b_item' -> && b_factor b_item'
+                       | eps
+                expr' -> eps expr''''''''''
+                       | && b_factor b_item' b_expr'
+               expr'' -> eps expr'''''''''''
+                       | && b_factor b_item' b_expr'
+              expr''' -> eps expr''''''''''''
+                       | > a_expr expr'
+                       | < a_expr expr'
+                       | >= a_expr expr'
+                       | <= a_expr expr'
+                       | == a_expr expr'
+                       | != a_expr expr'
+                       | && b_factor b_item' b_expr'
+             expr'''' -> eps expr'''''''''''''
+                       | > a_expr expr''
+                       | < a_expr expr''
+                       | >= a_expr expr''
+                       | <= a_expr expr''
+                       | == a_expr expr''
+                       | != a_expr expr''
+                       | && b_factor b_item' b_expr'
+            expr''''' -> eps expr''''''''''''''
+                       | && b_factor b_item' b_expr'
+           expr'''''' -> eps expr'''''''''''''''
+                       | && b_factor b_item' b_expr'
+          expr''''''' -> eps expr''''''''''''''''
+                       | > a_expr expr''''''
+                       | < a_expr expr''''''
+                       | >= a_expr expr''''''
+                       | <= a_expr expr''''''
+                       | == a_expr expr''''''
+                       | != a_expr expr''''''
+                       | && b_factor b_item' b_expr'
+         expr'''''''' -> eps expr'''''''''''''''''
+                       | > a_expr expr'''''
+                       | < a_expr expr'''''
+                       | >= a_expr expr'''''
+                       | <= a_expr expr'''''
+                       | == a_expr expr'''''
+                       | != a_expr expr'''''
+                       | && b_factor b_item' b_expr'
+        expr''''''''' -> * a_factor a_item'' a_expr'' expr'''''''
+                       | / a_factor a_item'' a_expr'' expr'''''''
+                       | % a_factor a_item'' a_expr'' expr'''''''
+                       | eps a_expr'' expr'''''''
+                       | ( args_list ) a_item'' a_expr'' expr'''
+                       | = expr
+            a_factor' -> eps
+                       | ( args_list )
+              r_expr' -> * a_factor a_item'' a_expr'' r_op a_expr
+                       | / a_factor a_item'' a_expr'' r_op a_expr
+                       | % a_factor a_item'' a_expr'' r_op a_expr
+                       | eps a_expr'' r_op a_expr
+                       | ( args_list ) a_item'' a_expr'' r_op a_expr
+            b_factor' -> eps
+                       | > a_expr
+                       | < a_expr
+                       | >= a_expr
+                       | <= a_expr
+                       | == a_expr
+                       | != a_expr
+           b_factor'' -> eps
+                       | > a_expr
+                       | < a_expr
+                       | >= a_expr
+                       | <= a_expr
+                       | == a_expr
+                       | != a_expr
+          b_factor''' -> eps
+                       | > a_expr
+                       | < a_expr
+                       | >= a_expr
+                       | <= a_expr
+                       | == a_expr
+                       | != a_expr
+         b_factor'''' -> eps
+                       | > a_expr
+                       | < a_expr
+                       | >= a_expr
+                       | <= a_expr
+                       | == a_expr
+                       | != a_expr
+        b_factor''''' -> * a_factor a_item'' a_expr'' b_factor''''
+                       | / a_factor a_item'' a_expr'' b_factor''''
+                       | % a_factor a_item'' a_expr'' b_factor''''
+                       | eps a_expr'' b_factor''''
+                       | ( args_list ) a_item'' a_expr'' b_factor'
+           ctrl_stmt' -> else stmt
+                       | eps
+        stmt_list'''' -> else stmt stmt_list'
+                       | if ( expr ) stmt stmt_list'''''
+                       | var stmt_list'''
+                       | eps
+                       | float decl_stmt''' stmt_list'
+                       | char decl_stmt'' stmt_list'
+                       | int decl_stmt' stmt_list'
+                       | const const_type const_decl_table stmt_list'
+                       | void var ( func_decl_para_list ) ; stmt_list'
+                       | for ( expr ; expr ; expr ) loop_stmt stmt_list'
+                       | while ( expr ) loop_stmt stmt_list'
+                       | do loop_comp_stmt while ( expr ) ; stmt_list'
+                       | return return_stmt' stmt_list'
+                       | { stmt_list } stmt_list'
+        loop_if_stmt' -> else loop_stmt
+                       | eps
+       stmt_list''''' -> else stmt stmt_list'
+                       | if ( expr ) stmt stmt_list'''''
+                       | var stmt_list'''
+                       | eps
+                       | float decl_stmt''' stmt_list'
+                       | char decl_stmt'' stmt_list'
+                       | int decl_stmt' stmt_list'
+                       | const const_type const_decl_table stmt_list'
+                       | void var ( func_decl_para_list ) ; stmt_list'
+                       | for ( expr ; expr ; expr ) loop_stmt stmt_list'
+                       | while ( expr ) loop_stmt stmt_list'
+                       | do loop_comp_stmt while ( expr ) ; stmt_list'
+                       | return return_stmt' stmt_list'
+                       | { stmt_list } stmt_list'
+   loop_stmt_list'''' -> else loop_stmt loop_stmt_list'
+                       | if ( expr ) loop_stmt loop_stmt_list''''
+                       | var loop_stmt_list'''
+                       | eps
+                       | float decl_stmt''' loop_stmt_list'
+                       | char decl_stmt'' loop_stmt_list'
+                       | int decl_stmt' loop_stmt_list'
+                       | const const_type const_decl_table loop_stmt_list'
+                       | void var ( func_decl_para_list ) ; loop_stmt_list'
+                       | for ( expr ; expr ; expr ) loop_stmt loop_stmt_list'
+                       | while ( expr ) loop_stmt loop_stmt_list'
+                       | do loop_comp_stmt while ( expr ) ; loop_stmt_list'
+                       | return return_stmt' loop_stmt_list'
+                       | break ; loop_stmt_list'
+                       | continue ; loop_stmt_list'
+                       | { loop_stmt_list } loop_stmt_list'
+       expr'''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+      expr''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+     expr'''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+    expr''''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+   expr'''''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+  expr''''''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+ expr'''''''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps
+expr''''''''''''''''' -> eps
+                       | || b_item b_expr'
+                       | eps

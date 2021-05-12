@@ -93,14 +93,11 @@ class Match_a_expr(Match_base):
     <实参列表> -> <实参> | ϵ
     <实参> -> <表达式> | <表达式> , <实参>
     =============================================================
-    <a_expr> -> <a_expr> + <a_term> | <a_expr> - <a_term> | <a_term>
-    <a_term> -> <a_term> * <a_factor> | <a_term> / <a_factor> | <a_term> % <a_factor> | <a_factor>
-    <a_factor> -> ( <a_expr> ) | <a_const> | <a_var> | <func_call>
-    <a_const> -> <a_num_const> | <a_char_const>
-    <a_var> -> <a_id>
-    <func_call> -> <a_id> ( <args_list> )
-    <args_list> -> <args> | ϵ
-    <args> -> <expr> | <expr> , <args>
+    a_expr -> a_expr + a_item | a_expr - a_item | a_item
+    a_item -> a_item * a_factor | a_item / a_factor | a_item % a_factor | a_factor
+    a_factor -> ( a_expr ) | const | var | func_call
+    func_call -> var ( args_list )
+    args_list -> args | ϵ
     =============================================================
    <a_expr> -> <a_term> <a_expr>''
    <a_term> -> <a_factor> <a_term>''
@@ -303,6 +300,9 @@ class Match_r_expr(Match_base):
     <关系运算符> -> > | < | >= | <= | == | !=
     =============================================================
     r_expr -> a_expr r_op a_expr
+    r_op -> > | < | >= | <= | == | !=
+    =============================================================
+    r_expr -> a_expr r_op a_expr
       r_op -> >
             | <
             | >=
@@ -353,6 +353,10 @@ class Match_b_expr(Match_base):
     <布尔表达式>-><布尔表达式>||<布尔项>|<布尔项>
     <布尔项>-><布尔项>&&<布尔因子>|<布尔因子>
     <布尔因子>-><算数表达式>|<关系表达式>|!<布尔表达式>
+    =============================================================
+    b_expr -> b_expr || b_item | b_item
+    b_item -> b_item && b_factor | b_factor
+    b_factor -> a_expr | r_expr | ! b_expr
     =============================================================
       b_expr -> b_item b_expr1
      b_expr1 -> || b_item b_expr1

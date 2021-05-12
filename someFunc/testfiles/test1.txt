@@ -2,7 +2,7 @@
 
 int a = 1 ;
 
-int main(){
+int_t main(){
 
     int result ;
 	int N = read() ;

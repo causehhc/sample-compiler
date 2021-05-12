@@ -1,6 +1,24 @@
-args	false	expr	)
+a_expr	false	( num var	&& ) , ; ||
+a_expr'	false	+ -
+a_expr''	true	+ - eps	!= && ) , ; < <= == > >= ||
+a_factor	false	( num var	!= % && ) * + , - / ; < <= == > >= ||
+a_factor'	true	( eps	!= % && ) * + , - / ; < <= == > >= ||
+a_item	false	( num var	!= && ) + , - ; < <= == > >= ||
+a_item'	false	% * /
+a_item''	true	% * / eps	!= && ) + , - ; < <= == > >= ||
+args	false	! ( num var	)
 args'	true	, eps	)
-args_list	true	expr eps	)
+args_list	true	! ( num var eps	)
+b_expr	false	! ( num var	&& ) , ; ||
+b_expr'	true	|| eps	&& ) , ;
+b_factor	false	! ( num var	&& ) , ; ||
+b_factor'	true	!= < <= == > >= eps	&& ) , ; ||
+b_factor''	true	!= < <= == > >= eps	&& ) , ; ||
+b_factor'''	true	!= < <= == > >= eps	&& ) , ; ||
+b_factor''''	true	!= < <= == > >= eps	&& ) , ; ||
+b_factor'''''	true	!= % ( * + - / < <= == > >= eps	&& ) , ; ||
+b_item	false	! ( num var	&& ) , ; ||
+b_item'	true	&& eps	) , ; ||
 break_stmt	false	break	$ break char const continue do else float for if int return var void while { }
 comp_stmt	false	{	$ char const do else float for if int return var void while { }
 const_decl	false	const	$ char const do else float for if int return var void while { }
@@ -9,6 +27,7 @@ const_decl_table'	false	, ;	$ break char const continue do else float for if int
 const_type	false	char float int	var
 continue_stmt	false	continue	$ break char const continue do else float for if int return var void while { }
 ctrl_stmt	false	do for if return while	$ char const do else float for if int return var void while { }
+ctrl_stmt'	true	else eps	$ char const do float for if int return var void while { }
 data_proc_stmt	false	var	$ char const do else float for if int return var void while { }
 data_proc_stmt'	false	( =	$ char const do else float for if int return var void while { }
 decl_stmt	false	char const float int void	$ char const do else float for if int return var void while { }
@@ -21,6 +40,24 @@ decl_stmt''''''	false	( , ; =	$ break char const continue do else float for if i
 decl_stmt_block	true	char const float int void eps	int_t
 do_while_stmt	false	do	$ char const do else float for if int return var void while { }
 exec_stmt	false	do for if return var while {	$ char const do else float for if int return var void while { }
+expr	false	! ( num var	) , ;
+expr'	true	&& || eps	) , ;
+expr''	true	&& || eps	) , ;
+expr'''	true	!= && < <= == > >= || eps	) , ;
+expr''''	true	!= && < <= == > >= || eps	) , ;
+expr'''''	true	&& || eps	) , ;
+expr''''''	true	&& || eps	) , ;
+expr'''''''	true	!= && < <= == > >= || eps	) , ;
+expr''''''''	true	!= && < <= == > >= || eps	) , ;
+expr'''''''''	true	!= % && ( * + - / < <= = == > >= || eps	) , ;
+expr''''''''''	true	|| eps	) , ;
+expr'''''''''''	true	|| eps	) , ;
+expr''''''''''''	true	|| eps	) , ;
+expr'''''''''''''	true	|| eps	) , ;
+expr''''''''''''''	true	|| eps	) , ;
+expr'''''''''''''''	true	|| eps	) , ;
+expr''''''''''''''''	true	|| eps	) , ;
+expr'''''''''''''''''	true	|| eps	) , ;
 for_stmt	false	for	$ char const do else float for if int return var void while { }
 func_block	true	char float int void eps
 func_call	false	var	;
@@ -36,20 +73,26 @@ func_def_para'	true	, eps	)
 func_def_para''	true	, eps	)
 func_def_para'''	true	, eps	)
 func_def_para_list	true	char float int eps	)
+g_expr	false	var
 give_stmt	false	var
 loop_comp_stmt	false	{	$ break char const continue do else float for if int return var void while { }
 loop_ctrl_stmt	false	break continue do for if return while	$ break char const continue do else float for if int return var void while { }
 loop_exec_stmt	false	break continue do for if return var while {	$ break char const continue do else float for if int return var void while { }
 loop_exec_stmt'	false	( =	$ break char const continue do else float for if int return var void while { }
 loop_if_stmt	false	if	$ break char const continue do else float for if int return var void while { }
+loop_if_stmt'	true	else eps	$ break char const continue do float for if int return var void while { }
 loop_stmt	false	break char const continue do float for if int return var void while {	$ break char const continue do else float for if int return var void while { }
 loop_stmt_list	false	break char const continue do float for if int return var void while {	}
 loop_stmt_list'	true	break char const continue do float for if int return var void while { eps	}
 loop_stmt_list''	false	( =	}
 loop_stmt_list'''	false	( =	}
+loop_stmt_list''''	true	break char const continue do else float for if int return var void while { eps	}
 program	false	char const float int int_t void
+r_expr	false	( num var
+r_expr'	false	!= % ( * + - / < <= == > >=
+r_op	false	!= < <= == > >=	( num var
 return_stmt	false	return	$ break char const continue do else float for if int return var void while { }
-return_stmt'	false	; expr	$ break char const continue do else float for if int return var void while { }
+return_stmt'	false	! ( ; num var	$ break char const continue do else float for if int return var void while { }
 sin_var_decl	false	var	, ;
 sin_var_decl'	true	= eps	, ;
 stmt	false	char const do float for if int return var void while {	$ char const do else float for if int return var void while { }
@@ -57,6 +100,8 @@ stmt_list	false	char const do float for if int return var void while {	}
 stmt_list'	true	char const do float for if int return var void while { eps	}
 stmt_list''	false	( =	}
 stmt_list'''	false	( =	}
+stmt_list''''	true	char const do else float for if int return var void while { eps	}
+stmt_list'''''	true	char const do else float for if int return var void while { eps	}
 var_decl_table	false	var	$ break char const continue do else float for if int int_t return var void while { }
 var_decl_table'	false	, ;	$ break char const continue do else float for if int int_t return var void while { }
 while_stmt	false	while	$ char const do else float for if int return var void while { }

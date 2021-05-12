@@ -141,11 +141,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         parser_anal.set_tokenList(self.token_list)
         res, idx, tree, error_list = parser_anal.run(True)
         res_info = parser_anal.tree.show(stdout=False)
-        print(res)
 
-        self.anlsInfo = ''
-        for item in error_list:
-            self.anlsInfo += '{}\n'.format(item)
+        self.anlsInfo = '{}\n{}'.format(res, error_list)
 
         self.textEditRes.clear()
         self.textEditRes.setText(res_info)

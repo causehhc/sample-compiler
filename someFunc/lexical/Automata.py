@@ -5,6 +5,9 @@ class TokenNode:
         self.row = row
         self.col = col
 
+    def __repr__(self):
+        return '\'{}\'({})[{}, {}]'.format(self.val, self.type, self.row, self.col)
+
 
 class Lex_analyzer:
     def __init__(self):
@@ -36,20 +39,34 @@ class Lex_analyzer:
         return res
 
     def lookup(self, s):
-        keyword = {"void", "main", "short", "long", "int", "double", "float", "while", "if", "else", "for", "break",
-                   "return"}
+        keyword = {
+            'char',
+            'const',
+            'float',
+            'int',
+            'void',
+            'do',
+            'for',
+            'if',
+            'return',
+            'while',
+            'break',
+            'continue',
+            'int_t',
+            'else',
+        }
         if s in keyword:
             return True
         return False
 
     def run(self):
         """
-        1-标识符
+        var-标识符
         2-关键字
         3-运算符
         4-界符
-        5-整数
-        6-实数
+        num-整数
+        num-实数
         :return:
         """
         ch = self.get_next()
@@ -69,12 +86,12 @@ class Lex_analyzer:
                             while ch and ch.isdigit():
                                 tmp_s += ch
                                 ch = self.get_next()
-                            self.token.append(TokenNode(tmp_s, '6', self.row_idx, self.col_idx))
+                            self.token.append(TokenNode(tmp_s, 'num', self.row_idx, self.col_idx))
                             break
                         else:
                             self.token.append(TokenNode(tmp_s, 'error', self.row_idx, self.col_idx))
                     if ch.isdigit() is False:
-                        self.token.append(TokenNode(tmp_s, '5', self.row_idx, self.col_idx))
+                        self.token.append(TokenNode(tmp_s, 'num', self.row_idx, self.col_idx))
                         break
             elif ch.isalpha() or ch == '_':  # 识别标识符 1 / 保留字 2
                 tmp_s = ''
@@ -84,7 +101,7 @@ class Lex_analyzer:
                 if self.lookup(tmp_s):  # 在keyword表中查找s是否是保留字
                     self.token.append(TokenNode(tmp_s, '2', self.row_idx, self.col_idx))
                 else:
-                    self.token.append(TokenNode(tmp_s, '1', self.row_idx, self.col_idx))
+                    self.token.append(TokenNode(tmp_s, 'var', self.row_idx, self.col_idx))
             elif ch == '>':  # 后面都是运算符 3
                 tmp_s = ''
                 tmp_s += ch

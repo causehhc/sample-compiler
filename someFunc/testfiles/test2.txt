@@ -1,5 +1,5 @@
 //if and while
-int main()
+int_t main()
 
 {
 

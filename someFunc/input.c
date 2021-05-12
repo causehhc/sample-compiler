@@ -1,6 +1,6 @@
 int a=1;
 int test_func (int);
-int main (){
+int_t main (){
     int i = 0, j = 0;
     i = test_func(1);
     if(i == 0){
@@ -16,11 +16,12 @@ int main (){
         }
         if( i < 10 ){
             i = i + 1 ;
-            if (j>5){
+            if (j>5)
+            {
                 j = j + 2;
             }
         }else{
-            const int j = 0;
+//            const int j = 0;
             break;
         }
     }

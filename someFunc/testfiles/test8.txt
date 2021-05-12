@@ -3,7 +3,7 @@ int a = 1 ;
 
 int sum(int,int);
 int max(int,int);
-int main(){
+int_t main(){
 
     int N = read() ;
     int M = read() ;

@@ -1,5 +1,5 @@
 //if
-int main()
+int_t main()
 
 {
   int i,N,sum = 0,choice=0;
