@@ -1,6 +1,6 @@
 import uuid
 from treelib import Tree
-
+import graphviz
 
 class Match_base:
     def __init__(self):
@@ -96,3 +96,9 @@ class Match_base:
         if len(self.info) == 0:
             self.info = 'all ok'
         return self.res, self.index - 1, self.tree, self.info
+
+    def create_dotPic(self, root_dir):
+        self.tree.to_graphviz(filename='{}/tree.dot'.format(root_dir))
+        string = open('{}/tree.dot'.format(root_dir)).read()
+        dot = graphviz.Source(string)
+        dot.render('{}/tree'.format(root_dir), format='png')
