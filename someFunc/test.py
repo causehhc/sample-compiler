@@ -69,9 +69,10 @@ def main_ft_SMC():
     SMC_anal.load_analyzer(path1, path2)
     SMC_anal.load_stack(token_list, 'program')
     # parser_anal.table_show()
-    SMC_anal.run(log=False)
+    SMC_anal.run(log=True)
     print(SMC_anal.AST_Tree.show(stdout=False))
     SMC_anal.create_dotPic('./treePic')
+    SMC_anal.bfs_detect()
 
 
 if __name__ == '__main__':

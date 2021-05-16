@@ -4,64 +4,61 @@ from someFunc.parser.forecastTable.Grammar import Parser_analyzer
 class SMC_analyzer(Parser_analyzer):
     def __init__(self):
         super().__init__()
+        self.qu = "op: {}\ta1: {}\ta2: {}\tres: {}"
+        self.symbol_table = []
+        self.op_stack = []
 
-    def run(self, log=False):
-        toke = self.stack_toke.pop(-1)
-        symbol = self.stack_anls.pop(-1)
-        while symbol != '#':
-            if symbol == toke.val or symbol == toke.type:
-                toke = self.stack_toke.pop(-1)
-                # 创建节点并新增
-                self.creat_node(symbol, self.node_parent_dict[symbol][-1])
-                if len(self.node_parent_dict[symbol]) == 0:
-                    self.node_parent_dict.pop(symbol)
-                if log:
-                    print('\t*HIT: {}\t<-\t{}'.format(symbol, toke))
-                if toke == '#':
-                    break
-            elif symbol in self.Vn:
-                if toke.type in ['var', 'num']:  # 变量-数字转换
-                    table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.type)]
-                else:
-                    table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.val)]
-                table_item = table_item.split(' ')
-                if table_item[0] == '':  # 错误分析
-                    print('\t*ERROR: {}\t<-\t{}'.format(symbol, toke))
-                    self.err_info.append(
-                        "row: {}, col: {}, token: '{}' cont match '{}'\n".format(toke.row, toke.col, toke, symbol))
-                elif table_item[0] == 'eps':  # 无效回溯
-                    if len(table_item) > 1:  # 有效分析
-                        temp = list(reversed(table_item))[0:-1]
-                        self.stack_anls.extend(temp)
-                        # 添加节点-父节点Hash表
-                        for item in temp:
-                            if item not in self.node_parent_dict:
-                                self.node_parent_dict[item] = []
-                            self.node_parent_dict[item].append(self.parent_uid)
-                else:  # 有效分析
-                    temp = list(reversed(table_item))
-                    self.stack_anls.extend(temp)
-                    # 创建节点并新增
-                    self.parent_uid = self.creat_node(symbol, self.node_parent_dict[symbol][-1])
-                    self.node_parent_dict[symbol].pop(-1)
-                    if len(self.node_parent_dict[symbol]) == 0:
-                        self.node_parent_dict.pop(symbol)
-                    # 添加节点-父节点Hash表
-                    for item in temp:
-                        if item not in self.node_parent_dict:
-                            self.node_parent_dict[item] = []
-                        self.node_parent_dict[item].append(self.parent_uid)
-                    if log:
-                        print()
-                        print("symb:\'{}\'----stack:{}".format(symbol, list(reversed(self.stack_anls))))
-                        print("toke:{}----stack:{}".format(toke, list(reversed(self.stack_toke))))
-            symbol = self.stack_anls.pop(-1)
-        self.node_parent_dict.clear()
-        # self.ans_show()
-        if len(self.err_info) == 0:
-            print('match compete!')
-        for item in self.err_info:
-            print(item)
+    def decl_statement_processing(self, node):
+        if node.tag == "decl_stmt'":
+            child = self.AST_Tree.children(node.identifier)
+            sym = {
+                'node_id': child[0].identifier,
+                'node': child[0],
+                'scope': child[0].data.scope,
+                'value': None
+            }
+            self.symbol_table.append(sym)
+
+    def give_statement_processing(self, node):
+        if node.tag == "=":
+            # get left_value
+            left_value = self.AST_Tree.parent(node.identifier)
+            left_value = self.AST_Tree.siblings(left_value.identifier)
+            # get expr_leaves
+            expr_node = self.AST_Tree.siblings(node.identifier)[0]
+            expr_subtree = self.AST_Tree.subtree(expr_node.identifier)
+            expr_leaves = expr_subtree.leaves()
+            # gen_op
+            op = self.qu.format('=', expr_leaves[0].data.value, '-', "{}({})".format(left_value[0].data.tag, left_value[0].identifier))
+            self.op_stack.append(op)
+            print(op)
+
+    def control_statement_processing(self, node):
+        if node.tag == "if":
+            siblings = self.AST_Tree.siblings(node.identifier)
+            ctrl_0 = siblings[1]
+            ctrl_1 = siblings[3]
+            ctrl_2 = siblings[4]
+            print(ctrl_0)
+            print(ctrl_1)
+            print(ctrl_2)
+
+    def bfs_detect(self):
+        queue = [self.AST_Tree_root]
+        while queue:
+            node = queue.pop(0)
+
+            # TODO
+            # decl statement processing
+            self.decl_statement_processing(node)
+            # give statement processing
+            self.give_statement_processing(node)
+            # control statement processing
+            self.control_statement_processing(node)
+
+            queue.extend(self.AST_Tree.children(node.identifier))
+        # for item in self.symbol_table:
+        #     print(item)
 
 
 def main():

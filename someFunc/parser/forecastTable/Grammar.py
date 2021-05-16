@@ -1,4 +1,3 @@
-import uuid
 import graphviz
 from treelib import Tree
 
@@ -23,8 +22,11 @@ class Parser_analyzer:
         self.err_info = []
 
         self.AST_Tree = Tree()
+        self.AST_Tree_root = None
         self.parent_uid = None
         self.node_parent_dict = None
+
+        self.current_anal_scope = 0
 
     def load_analyzer(self, prod_path, ff_path):
         prod_set = {}
@@ -89,7 +91,7 @@ class Parser_analyzer:
                 for temp_prod in item_prod:
                     temp_shit = temp_prod.split(' ')
                     temp_first = temp_shit[0]
-                    if temp_first == 'eps' and len(temp_shit)>1:
+                    if temp_first == 'eps' and len(temp_shit) > 1:
                         aim2_prod = temp_prod
                     if non == temp_first:
                         aim_prod = temp_prod
@@ -124,8 +126,6 @@ class Parser_analyzer:
 
         self.node_parent_dict = {start: [None]}
 
-
-
     def table_show(self):
         print(self.Vt)
         idx = 0
@@ -143,13 +143,13 @@ class Parser_analyzer:
         print(self.stack_toke)
         print()
 
-    def creat_node(self, name, parent):
-        iid = str(uuid.uuid1())
+    def creat_node(self, tag, parent, data):
         if self.AST_Tree.size() == 0:
-            self.AST_Tree.create_node(tag='{}'.format(name), identifier=iid)
+            node = self.AST_Tree.create_node(tag='{}'.format(tag), data=data)
+            self.AST_Tree_root = node
         else:
-            self.AST_Tree.create_node(tag='{}'.format(name), identifier=iid, parent=parent)
-        return iid
+            node = self.AST_Tree.create_node(tag='{}'.format(tag), parent=parent, data=data)
+        return node.identifier
 
     def create_dotPic(self, root_dir):
         # root_dir = './treePic'
@@ -162,12 +162,22 @@ class Parser_analyzer:
         toke = self.stack_toke.pop(-1)
         symbol = self.stack_anls.pop(-1)
         while symbol != '#':
-            if symbol == toke.val or symbol == toke.type:
-                toke = self.stack_toke.pop(-1)
+            if symbol in [toke.tag, toke.type]:
+                # 刷新作用域
+                if symbol == '{':
+                    self.current_anal_scope += 1
+                elif symbol == '}':
+                    self.current_anal_scope -= 1
+                else:
+                    toke.set_scope(self.current_anal_scope)
+                # 刷新真值
+                if toke.type == 'num':
+                    toke.set_value(toke.tag)
                 # 创建节点并新增
-                self.creat_node(symbol, self.node_parent_dict[symbol][-1])
+                self.creat_node(symbol, self.node_parent_dict[symbol][-1], toke)
                 if len(self.node_parent_dict[symbol]) == 0:
                     self.node_parent_dict.pop(symbol)
+                toke = self.stack_toke.pop(-1)
                 if log:
                     print('\t*HIT: {}\t<-\t{}'.format(symbol, toke))
                 if toke == '#':
@@ -176,7 +186,7 @@ class Parser_analyzer:
                 if toke.type in ['var', 'num']:  # 变量-数字转换
                     table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.type)]
                 else:
-                    table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.val)]
+                    table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.tag)]
                 table_item = table_item.split(' ')
                 if table_item[0] == '':  # 错误分析
                     print('\t*ERROR: {}\t<-\t{}'.format(symbol, toke))
@@ -195,7 +205,7 @@ class Parser_analyzer:
                     temp = list(reversed(table_item))
                     self.stack_anls.extend(temp)
                     # 创建节点并新增
-                    self.parent_uid = self.creat_node(symbol, self.node_parent_dict[symbol][-1])
+                    self.parent_uid = self.creat_node(symbol, self.node_parent_dict[symbol][-1], symbol)
                     self.node_parent_dict[symbol].pop(-1)
                     if len(self.node_parent_dict[symbol]) == 0:
                         self.node_parent_dict.pop(symbol)

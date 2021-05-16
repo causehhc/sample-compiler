@@ -1,12 +1,21 @@
 class TokenNode:
-    def __init__(self, val, type, row, col):
-        self.val = val
+    def __init__(self, tag, type, row, col):
+        self.tag = tag
         self.type = type
         self.row = row
         self.col = col
 
+        self.scope = 0
+        self.value = None
+
+    def set_scope(self, s):
+        self.scope = s
+
+    def set_value(self, s):
+        self.value = s
+
     def __repr__(self):
-        return '\'{}\'({})[{}, {}]'.format(self.val, self.type, self.row, self.col)
+        return '\'{}\'({})[{}, {}]'.format(self.tag, self.type, self.row, self.col)
 
 
 class Lex_analyzer:

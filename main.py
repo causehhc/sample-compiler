@@ -120,7 +120,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
         res = ''
         for item in token_list:
-            token_str = '{}\t{}\t{}\t{}\t{}'.format(token_list.index(item), item.val, item.type, item.row, item.col)
+            token_str = '{}\t{}\t{}\t{}\t{}'.format(token_list.index(item), item.data, item.type, item.row, item.col)
             res += '{}\n'.format(token_str)
         self.anlsInfo = ''
         for item in info_list:

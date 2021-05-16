@@ -12,7 +12,7 @@
     - 语法树可视化(不含无效分支)
     - 表达式与语句联合分析
   - 语义分析及中间代码生成
-    - 语法制导翻译（施工中）
+    - 语法制导翻译(施工中)
 ### 2、图形界面
 - pyqt5
 ## 二、目录说明
@@ -46,10 +46,10 @@ sample-compiler  # 根目录
 ```
 ## 三、示例
 ### 1、 RE->NFA->DFA->MinDFA
-自动机可视化：
+自动机可视化:  
 ![avatar](pic/1.jpg)
 ### 2、 词法分析
-输出结果：
+输出结果:  
 - Note: 格式形如`'token源'(种别码)[行位置, 列位置]`
 ```text
 'int_t'(2)[0, 6]
@@ -64,7 +64,7 @@ sample-compiler  # 根目录
 ```
 ### 3、 语法分析
 #### 3.1、 递归下降法
-递归语法树：
+递归语法树:  
 ```text
 program
 ├── (
@@ -92,7 +92,7 @@ program
 ```
 ![avatar](pic/5.jpg)
 #### 3.2、 预测分析表法
-LL(1)文法：
+LL(1)文法:  
 ```text
                  stmt -> decl_stmt
                        | exec_stmt
@@ -113,7 +113,7 @@ LL(1)文法：
        func_decl_para -> float func_decl_para'''
 ......
 ```
-First-Follow集：
+First-Follow集:  
 ```text
 a_expr	false	( num var	&& ) , ; ||
 a_expr'	false	+ -

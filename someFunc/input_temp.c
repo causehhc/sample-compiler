@@ -1,5 +1,18 @@
 int_t main (){
     int i=0;
+    int j=0;
+    if (i==0){
+        int k=0;
+        i=1;
+    }else{
+        int k=0;
+        j=1;
+    }
+//    if(i){
+//        func_a();
+//    }else{
+//        func_b();
+//    }
 //    for(i = 0; i < 10; i = i + 1){
 //        int j=0;
 //        if( i < 10 ){
@@ -11,5 +24,5 @@ int_t main (){
 //            break;
 //        }
 //    }
-//    return 0;
+    return 0;
 }
