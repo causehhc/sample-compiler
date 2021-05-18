@@ -15,7 +15,7 @@ class TokenNode:
         self.value = s
 
     def __repr__(self):
-        return '\'{}\'({})[{}, {}]'.format(self.tag, self.type, self.row, self.col)
+        return '\'{}\'({})[{}, {}]{}'.format(self.tag, self.type, self.row, self.col, self.value)
 
 
 class Lex_analyzer:

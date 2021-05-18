@@ -72,7 +72,7 @@ def main_ft_SMC():
     SMC_anal.run(log=True)
     print(SMC_anal.AST_Tree.show(stdout=False))
     SMC_anal.create_dotPic('./treePic')
-    # SMC_anal.dfs_detect()
+    SMC_anal.dfs_detect()
 
 
 if __name__ == '__main__':
