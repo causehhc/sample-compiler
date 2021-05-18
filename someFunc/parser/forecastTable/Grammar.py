@@ -175,6 +175,7 @@ class Parser_analyzer:
                     toke.set_value(toke.tag)
                 # 创建节点并新增
                 self.creat_node(symbol, self.node_parent_dict[symbol][-1], toke)
+                self.node_parent_dict[symbol].pop(-1)
                 if len(self.node_parent_dict[symbol]) == 0:
                     self.node_parent_dict.pop(symbol)
                 toke = self.stack_toke.pop(-1)
