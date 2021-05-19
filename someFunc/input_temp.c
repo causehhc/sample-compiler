@@ -3,6 +3,7 @@ int_t main (){
     if (i==0){
         i=2;
         if (i==2){
+            int j=0;
             i=3;
         }else{
             i=4;

@@ -17,7 +17,7 @@ class Match_base:
     def set_tokenList(self, token_list):
         self.token_list = token_list
         self.index = 0
-        self.token = self.token_list[self.index].data
+        self.token = self.token_list[self.index].tag
         self.token_node = self.token_list[self.index]
         self.tree = Tree()
         self.anls_proc = []
@@ -32,7 +32,7 @@ class Match_base:
             self.index += 1
         for i in range(tmp + 1):
             if self.index - tmp + i < len(self.token_list):
-                self.anls_proc.append(self.token_list[self.index - tmp + i].data)
+                self.anls_proc.append(self.token_list[self.index - tmp + i].tag)
         if self.token is not None:
             self.tree.create_node(tag=self.token, identifier=str(uuid.uuid1()), parent=parent)
 
@@ -43,7 +43,7 @@ class Match_base:
             return self.token
         else:
             self.index += 1
-            self.token = self.token_list[self.index].data
+            self.token = self.token_list[self.index].tag
             self.token_node = self.token_list[self.index]
             return self.token
 
@@ -51,13 +51,13 @@ class Match_base:
         if re_num == -1:
             self.index = 0
             self.anls_proc.clear()
-            self.token = self.token_list[self.index].data
+            self.token = self.token_list[self.index].tag
             self.token_node = self.token_list[self.index]
         else:
             self.index -= re_num
             for i in range(re_num):
                 self.anls_proc.pop(len(self.anls_proc)-1)
-            self.token = self.token_list[self.index].data
+            self.token = self.token_list[self.index].tag
             self.token_node = self.token_list[self.index]
 
     def creat_node(self, name, parent):
@@ -86,7 +86,7 @@ class Match_base:
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
                 self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
-                                                                              self.token_node.data,
+                                                                              self.token_node.tag,
                                                                               self.token_node.row,
                                                                               self.token_node.col)
                 if flag:

@@ -284,7 +284,7 @@ class Match_a_expr(Match_base):
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
                 self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
-                                                                              self.token_node.data,
+                                                                              self.token_node.tag,
                                                                               self.token_node.row,
                                                                               self.token_node.col)
                 if flag:

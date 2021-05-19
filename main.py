@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
 
 from someFunc.lexical.Automata import Lex_analyzer
-from someFunc.parser_re.Statement import Match_program_stmt
+from someFunc.parser.recursiveDescent.Statement import Match_program_stmt
 from ui import Ui_MainWindow
 from subui import Ui_rndm
 
@@ -45,13 +45,13 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
         # LexAnls
         self.actionLexicalAnalyzer.triggered.connect(self.LexAnls)
-        self.actionNFA_DFA_MFA.triggered.connect(self.rndm)
+        # self.actionNFA_DFA_MFA.triggered.connect(self.rndm)
 
         # Parsing
         self.actionParser.triggered.connect(self.parser)
 
         # Symbol
-        self.actionSymbol.triggered.connect(self.update_symbol_sta)
+        # self.actionSymbol.triggered.connect(self.update_symbol_sta)
 
         # Help
         self.actionHelp.triggered.connect(self.open_help)
@@ -120,7 +120,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
         res = ''
         for item in token_list:
-            token_str = '{}\t{}\t{}\t{}\t{}'.format(token_list.index(item), item.data, item.type, item.row, item.col)
+            token_str = '{}\t{}\t{}\t{}\t{}'.format(token_list.index(item), item.tag, item.type, item.row, item.col)
             res += '{}\n'.format(token_str)
         self.anlsInfo = ''
         for item in info_list:
@@ -128,7 +128,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
         self.textEditRes.clear()
         self.textEditRes.setText(res)
-        self.update_symbol_sta()
+        self.textEditInfo.setText(self.anlsInfo)
 
     def rndm(self):
         my_subWin.show()
@@ -146,14 +146,14 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
         self.textEditRes.clear()
         self.textEditRes.setText(res_info)
-        self.update_symbol_sta()
+        self.textEditInfo.setText(self.anlsInfo)
 
     # Symbol
-    def update_symbol_sta(self):
-        if not self.actionSymbol.isChecked():
-            self.textEditInfo.clear()
-        else:
-            self.textEditInfo.setText(self.anlsInfo)
+    # def update_symbol_sta(self):
+    #     if not self.actionSymbol.isChecked():
+    #         self.textEditInfo.clear()
+    #     else:
+    #         self.textEditInfo.setText(self.anlsInfo)
 
     # Help
     def open_help(self):

@@ -2,12 +2,14 @@ from someFunc.parser.forecastTable.Grammar import Parser_analyzer
 
 
 class Symbol:
-    def __init__(self, node, scope):
+    def __init__(self, node, type, scope):
         self.node = node
+        self.type = type
         self.scope = scope
 
     def __repr__(self):
-        return "{}".format(self.node.data)
+        return "tag: {},\ttype: {},\tvalue: {},\tscope: {}".format(self.node.data.tag, self.type, self.node.data.value,
+                                                                   self.scope)
 
 
 class Quaternion:
@@ -54,8 +56,10 @@ class SMC_analyzer(Parser_analyzer):
 
     def decl_statement_processing(self, node):
         if node.tag == "decl_stmt'":
+            type_node = self.AST_Tree.siblings(node.identifier)[0]
+            type = type_node.tag
             child = self.AST_Tree.children(node.identifier)
-            sym = Symbol(child[0], child[0].data.scope)
+            sym = Symbol(child[0], type, child[0].data.scope)
             self.symbol_table[sym.node.data.tag] = sym
 
     def give_statement_processing(self, node):
@@ -68,7 +72,7 @@ class SMC_analyzer(Parser_analyzer):
             expr_subtree = self.AST_Tree.subtree(expr_node.identifier)
             expr_leaves = expr_subtree.leaves()
             # gen_op
-            self.symbol_table[left_value[0].data.tag].node.data.value = expr_leaves[0].data.value
+            # self.symbol_table[left_value[0].data.tag].node.data.value = expr_leaves[0].data.value
             new_op = Quaternion('=', expr_leaves[0].data.value, '-',
                                 "{}({})".format(left_value[0].data.tag, self.symbol_table[left_value[0].data.tag]))
             self.op_stack.append(new_op)
@@ -79,17 +83,19 @@ class SMC_analyzer(Parser_analyzer):
             ctrl_0 = siblings[1]  # 跳转条件
             ctrl_0_subtree = self.AST_Tree.subtree(ctrl_0.identifier)
             ctrl_0_subtree_leaves = ctrl_0_subtree.leaves()
-            temp = Symbol(None, -1)
-            if ctrl_0_subtree_leaves[1].data.tag == self.symbol_table[ctrl_0_subtree_leaves[2].data.tag].node.data.value:
+            temp = Symbol(None, 'bool', -1)
+            if ctrl_0_subtree_leaves[1].data.tag == self.symbol_table[
+                ctrl_0_subtree_leaves[2].data.tag].node.data.value:
                 temp.value = 1
             else:
                 temp.value = 0
             self.temp_stack.append(temp)
-            new_op1 = Quaternion('=', '{}'.format(temp.value), '-', "{}({})".format("T{}".format(self.temp_stack.index(temp)),
-                                                                              self.temp_stack.index(temp)))
+            new_op1 = Quaternion('=', '{}'.format(temp.value), '-',
+                                 "{}({})".format("T{}".format(self.temp_stack.index(temp)),
+                                                 self.temp_stack.index(temp)))
             new_op2 = Quaternion('jnz', "T{}".format(self.temp_stack.index(temp)), '-',
                                  "{}({})".format('None', len(self.op_stack) + 3))
-            new_op3 = Quaternion('jump', "-", '-', "{}({})".format('None', 'None'))
+            new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
             self.op_stack.extend([new_op1, new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
         elif node.tag == '}':
@@ -98,7 +104,7 @@ class SMC_analyzer(Parser_analyzer):
                 siblings = self.AST_Tree.siblings(end_parent.identifier)
                 aim_node = siblings[0]
                 if aim_node.tag == "if":
-                    new_op = Quaternion('jump', "-", '-', "{}({})".format('None', 'None'))
+                    new_op = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
                     self.op_stack.extend([new_op])
                     self.jump_queue.extend([self.op_stack.index(new_op)])
 
@@ -139,7 +145,7 @@ class SMC_analyzer(Parser_analyzer):
             self.check_backfill_processing(node)
 
             stack.extend(list(reversed(self.AST_Tree.children(node.identifier))))
-        for item in self.symbol_table:
+        for item in self.symbol_table.items():
             print(item)
         for item in self.op_stack:
             print("{}\t{}".format(self.op_stack.index(item), item))

@@ -305,7 +305,7 @@ class Match_base_stmt(Match_base):
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
                 self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
-                                                                              self.token_node.data,
+                                                                              self.token_node.tag,
                                                                               self.token_node.row,
                                                                               self.token_node.col)
                 if flag:
@@ -1064,7 +1064,7 @@ class Match_exec_stmt(Match_base):
         if self.res is True:
             if len(self.token_list) > len(self.anls_proc):
                 self.info = 'error: {}, token: {}, row: {}, col: {}\n'.format('unmatched char',
-                                                                              self.token_node.data,
+                                                                              self.token_node.tag,
                                                                               self.token_node.row,
                                                                               self.token_node.col)
                 if flag:
@@ -1185,7 +1185,7 @@ class Match_program_stmt(Match_base):
         iid = self.creat_node('program', parent)
 
         if self.func_decl_stmt_block(iid):
-            if self.token == 'int':
+            if self.token == 'int_t':
                 if self.get_next(iid) is None:
                     return True
                 if self.token == 'main':

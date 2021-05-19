@@ -384,6 +384,9 @@
    <property name="text">
     <string>LexicalAnalyzer</string>
    </property>
+   <property name="iconText">
+    <string>Lex</string>
+   </property>
   </action>
   <action name="actionNFA_DFA_MFA">
    <property name="text">
