@@ -76,6 +76,6 @@ def main_ft_SMC():
 
 
 if __name__ == '__main__':
-    main_rd()
-    # main_ft()
-    # main_ft_SMC()
+    # main_rd()
+    main_ft()
+    main_ft_SMC()

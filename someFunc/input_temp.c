@@ -1,5 +1,8 @@
 int_t main (){
-    int i=0;
+    int i=1+2+3;
+    while(i>0){
+        i = 1;
+    }
     if (i==0){
         i=2;
         if (i==2){
