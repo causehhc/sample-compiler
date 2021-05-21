@@ -55,12 +55,34 @@ class SMC_analyzer(Parser_analyzer):
             end_parent = self.AST_Tree.get_node(end_parent.identifier)
         return end_parent
 
+    def arith_mid(self, postexp):
+        postexp = postexp[::-1]
+        op = {'+', '-', '*', '/'}
+        opnd = []
+        T = None
+        for i in range(len(postexp)):
+            if postexp[i] not in op:
+                opnd.append(postexp[i])
+            else:
+                a = opnd.pop(-1)
+                b = opnd.pop(-1)
+                T = "T{}".format(len(self.temp_stack))
+                self.temp_stack.append(T)
+                opnd.append(T)
+                new_op = Quaternion(
+                    '{}'.format(postexp[i]),
+                    a,
+                    b,
+                    T
+                )
+                self.op_stack.append(new_op)
+        return T
+
     def expr_processing(self, node):
         expr_subtree = self.AST_Tree.subtree(node.identifier)
         expr_leaves = expr_subtree.leaves()
         expr_list = []
         for item in expr_leaves:
-            temp = None
             if item.tag == 'num':
                 temp = item.data.tag
             elif item.tag == 'var':
@@ -68,24 +90,46 @@ class SMC_analyzer(Parser_analyzer):
             else:
                 temp = item.tag
             expr_list.append(temp)
-        # if expr_list[0] == '>':
-        #     temp = Symbol(None, 'bool', -1)
-        #     self.temp_stack.append(temp)
-        #     temp.value = '1'
-        #     new_op1 = Quaternion('>', '{}'.format(expr_list[2]), '{}'.format(expr_list[1]), "T{}".format(self.temp_stack.index(temp)))
-        #     self.op_stack.extend([new_op1])
-        res = str(expr_list)
-        return res
+
+        if expr_list[0] == '>':
+            temp = Symbol(None, 'bool', -1)
+            self.temp_stack.append(temp)
+            new_op1 = Quaternion('>', '{}'.format(expr_list[2]), '{}'.format(expr_list[1]),
+                                 "T{}".format(self.temp_stack.index(temp)))
+            self.op_stack.extend([new_op1])
+        elif expr_list[0] == '==':
+            temp = Symbol(None, 'bool', -1)
+            self.temp_stack.append(temp)
+            new_op1 = Quaternion('==', '{}'.format(expr_list[2]), '{}'.format(expr_list[1]),
+                                 "T{}".format(self.temp_stack.index(temp)))
+            self.op_stack.extend([new_op1])
+        else:
+            res = ''
+            for item in expr_list:
+                res += item
+            T = self.arith_mid(res)
+            if T is None:
+                T = res
+            return T
 
     def decl_statement_processing(self, node):
+        res = True
+        info = []
         if node.tag == "decl_stmt'":
             type_node = self.AST_Tree.siblings(node.identifier)[0]
             type = type_node.tag
             child = self.AST_Tree.children(node.identifier)
             sym = Symbol(child[0], type, child[0].data.scope)
-            self.symbol_table[sym.node.data.tag] = sym
+            if sym.node.data.tag not in self.symbol_table:
+                self.symbol_table[sym.node.data.tag] = sym
+            else:
+                res = False
+                info.append("{}".format(sym.node.data))
+        return res, info
 
     def give_statement_processing(self, node):
+        res = True
+        info = []
         if node.tag == "=":
             # get left_value
             left_value = self.AST_Tree.parent(node.identifier)
@@ -93,41 +137,36 @@ class SMC_analyzer(Parser_analyzer):
             # get expr_leaves
             expr_node = self.AST_Tree.siblings(node.identifier)[0]
             res = self.expr_processing(expr_node)
-            self.symbol_table[left_value[0].data.tag].node.data.value = res
+            if left_value[0].data.tag in self.symbol_table:
+                self.symbol_table[left_value[0].data.tag].node.data.value = res
+            else:
+                res = False
+                info.append("{}".format(left_value[0].data))
+                return res, info
             # gen_op
-            new_op = Quaternion('=', res, '-', "{}({})".format(left_value[0].data.tag, self.symbol_table[left_value[0].data.tag]))
+            new_op = Quaternion('=', res, '-',
+                                "{}({})".format(left_value[0].data.tag, self.symbol_table[left_value[0].data.tag]))
             self.op_stack.append(new_op)
+        return res, info
 
     def control_statement_if_processing(self, node):
         if node.tag == "if":
             siblings = self.AST_Tree.siblings(node.identifier)
             ctrl_0 = siblings[1]  # 跳转条件
-            res = self.expr_processing(ctrl_0)
-            temp = Symbol(None, 'bool', -1)
-            temp.value = res
-            self.temp_stack.append(temp)
-            new_op1 = Quaternion('=', '{}'.format(temp.value), '-',
-                                 "{}({})".format("T{}".format(self.temp_stack.index(temp)),
-                                                 self.temp_stack.index(temp)))
-            new_op2 = Quaternion('jnz', "T{}".format(self.temp_stack.index(temp)), '-',
-                                 "{}({})".format('None', len(self.op_stack) + 3))
+            self.expr_processing(ctrl_0)
+            new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
+                                 "{}({})".format('None', len(self.op_stack) + 2))
             new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
             self.op_stack.extend([new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
         elif node.tag == 'while':
             siblings = self.AST_Tree.siblings(node.identifier)
             ctrl_0 = siblings[1]  # 跳转条件
-            res = self.expr_processing(ctrl_0)
-            temp = Symbol(None, 'bool', -1)
-            temp.value = res
-            self.temp_stack.append(temp)
-            new_op1 = Quaternion('=', '{}'.format(temp.value), '-',
-                                 "{}({})".format("T{}".format(self.temp_stack.index(temp)),
-                                                 self.temp_stack.index(temp)))
-            new_op2 = Quaternion('jnz', "T{}".format(self.temp_stack.index(temp)), '-',
-                                 "{}({})".format('None', len(self.op_stack) + 3))
+            self.expr_processing(ctrl_0)
+            new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
+                                 "{}({})".format('None', len(self.op_stack) + 2))
             new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
-            self.op_stack.extend([new_op1, new_op2, new_op3])
+            self.op_stack.extend([new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
         elif node.tag == '}':
             end_parent = self.get_parent(node, 3)
@@ -169,6 +208,10 @@ class SMC_analyzer(Parser_analyzer):
                         self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
 
     def dfs_detect(self):
+        res1 = False
+        info1 = []
+        res2 = False
+        info2 = []
         stack = [self.AST_Tree_root]
         while stack:
             node = stack.pop(-1)
@@ -176,19 +219,30 @@ class SMC_analyzer(Parser_analyzer):
 
             # TODO
             # decl statement processing
-            self.decl_statement_processing(node)
-            # give statement processing
-            self.give_statement_processing(node)
-            # control statement processing
-            self.control_statement_if_processing(node)
-            # check backfill processing
-            self.check_backfill_processing(node)
+            res1, info1 = self.decl_statement_processing(node)
+            if res1:
+                # give statement processing
+                res2, info2 = self.give_statement_processing(node)
+                if res2:
+                    # control statement processing
+                    self.control_statement_if_processing(node)
+                    # check backfill processing
+                    self.check_backfill_processing(node)
 
-            stack.extend(list(reversed(self.AST_Tree.children(node.identifier))))
-        for item in self.symbol_table.items():
-            print(item)
-        for item in self.op_stack:
-            print("{}\t{}".format(self.op_stack.index(item), item))
+                    stack.extend(list(reversed(self.AST_Tree.children(node.identifier))))
+            if res1 is False or res2 is False:
+                if res1 is False:
+                    print("Error: Variable definition")
+                    print(info1)
+                if res2 is False:
+                    print("Error: Variable is not defined")
+                    print(info2)
+                break
+        if res1 and res2:
+            for item in self.symbol_table.items():
+                print(item)
+            for item in self.op_stack:
+                print("{}\t{}".format(self.op_stack.index(item), item))
 
 
 def main():
