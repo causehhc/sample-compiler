@@ -144,8 +144,10 @@ class SMC_analyzer(Parser_analyzer):
                 info.append("{}".format(left_value[0].data))
                 return res, info
             # gen_op
+            # new_op = Quaternion('=', res, '-',
+            #                     "{}({})".format(left_value[0].data.tag, self.symbol_table[left_value[0].data.tag]))
             new_op = Quaternion('=', res, '-',
-                                "{}({})".format(left_value[0].data.tag, self.symbol_table[left_value[0].data.tag]))
+                                "{}".format(left_value[0].data.tag))
             self.op_stack.append(new_op)
         return res, info
 
@@ -154,18 +156,24 @@ class SMC_analyzer(Parser_analyzer):
             siblings = self.AST_Tree.siblings(node.identifier)
             ctrl_0 = siblings[1]  # 跳转条件
             self.expr_processing(ctrl_0)
+            # new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
+            #                      "{}({})".format('None', len(self.op_stack) + 2))
             new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
-                                 "{}({})".format('None', len(self.op_stack) + 2))
-            new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                                 "{}".format(len(self.op_stack) + 2))
+            # new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+            new_op3 = Quaternion('j', "-", '-', "{}".format('None', 'None'))
             self.op_stack.extend([new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
         elif node.tag == 'while':
             siblings = self.AST_Tree.siblings(node.identifier)
             ctrl_0 = siblings[1]  # 跳转条件
             self.expr_processing(ctrl_0)
+            # new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
+            #                      "{}({})".format('None', len(self.op_stack) + 2))
             new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_stack) - 1), '-',
-                                 "{}({})".format('None', len(self.op_stack) + 2))
-            new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                                 "{}".format(len(self.op_stack) + 2))
+            # new_op3 = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+            new_op3 = Quaternion('j', "-", '-', "{}".format('None'))
             self.op_stack.extend([new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
         elif node.tag == '}':
@@ -174,11 +182,13 @@ class SMC_analyzer(Parser_analyzer):
                 siblings = self.AST_Tree.siblings(end_parent.identifier)
                 aim_node = siblings[0]
                 if aim_node.tag == "if":
-                    new_op = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                    # new_op = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                    new_op = Quaternion('j', "-", '-', "{}".format('None'))
                     self.op_stack.extend([new_op])
                     self.jump_queue.extend([self.op_stack.index(new_op)])
                 elif aim_node.tag == "while":
-                    new_op = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                    # new_op = Quaternion('j', "-", '-', "{}({})".format('None', 'None'))
+                    new_op = Quaternion('j', "-", '-', "{}".format('None'))
                     self.op_stack.extend([new_op])
                     self.jump_queue.extend([self.op_stack.index(new_op)])
 
@@ -190,7 +200,8 @@ class SMC_analyzer(Parser_analyzer):
                 if siblings[0].tag == 'else':
                     if len(self.jump_stack) != 0:
                         idx = self.jump_stack.pop(-1)
-                        self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        # self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        self.op_stack[idx].res = "{}".format(len(self.op_stack))
         elif node.tag == '}':
             end_parent = self.get_parent(node, 3)
             if end_parent is not None:
@@ -198,14 +209,17 @@ class SMC_analyzer(Parser_analyzer):
                 if siblings[0].tag == 'else':
                     if len(self.jump_queue) != 0:
                         idx = self.jump_queue.pop(0)
-                        self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        # self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        self.op_stack[idx].res = "{}".format(len(self.op_stack))
                 elif siblings[0].tag == 'while':
                     if len(self.jump_queue) != 0:
                         idx = self.jump_queue.pop(0)
-                        self.op_stack[idx].res = "{}({})".format('None', self.jump_stack[-1] - 2)
+                        # self.op_stack[idx].res = "{}({})".format('None', self.jump_stack[-1] - 2)
+                        self.op_stack[idx].res = "{}".format(self.jump_stack[-1] - 2)
                     if len(self.jump_stack) != 0:
                         idx = self.jump_stack.pop(-1)
-                        self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        # self.op_stack[idx].res = "{}({})".format('None', len(self.op_stack))
+                        self.op_stack[idx].res = "{}".format(len(self.op_stack))
 
     def dfs_detect(self):
         res1 = False
@@ -239,10 +253,9 @@ class SMC_analyzer(Parser_analyzer):
                     print(info2)
                 break
         if res1 and res2:
-            for item in self.symbol_table.items():
-                print(item)
-            for item in self.op_stack:
-                print("{}\t{}".format(self.op_stack.index(item), item))
+            return self.symbol_table, self.op_stack
+        else:
+            return None
 
 
 def main():

@@ -72,7 +72,19 @@ def main_ft_SMC():
     SMC_anal.run(log=True)
     print(SMC_anal.AST_Tree.show(stdout=False))
     SMC_anal.create_dotPic('./treePic')
-    SMC_anal.dfs_detect()
+
+    # 宋哥必看
+    symbol_table, op_stack = SMC_anal.dfs_detect()  # 返回符号表及四元式组
+    symbol_table_new = []
+    op_stack_new = []
+    for item in symbol_table.items():
+        temp = item[0]
+        symbol_table_new.append(temp)
+        print(temp)
+    for item in op_stack:
+        temp = [item.op, item.a1, item.a2, item.res]
+        op_stack_new.append(temp)
+        print(temp)
 
 
 if __name__ == '__main__':
