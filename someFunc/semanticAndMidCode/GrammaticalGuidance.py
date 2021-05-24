@@ -140,7 +140,7 @@ class SMC_analyzer(Parser_analyzer):
             child = self.AST_Tree.children(node.identifier)
             var_decl_table_node = child[1]
             table_child = self.AST_Tree.children(var_decl_table_node.identifier)
-            if table_child[1].tag == 'expr':
+            if len(table_child) > 1 and table_child[1].tag == 'expr':
                 self.AST_Tree.remove_node(table_child[1].identifier)
             var_decl_table_tree = self.AST_Tree.subtree(var_decl_table_node.identifier)
             var_decl_table = var_decl_table_tree.leaves()
