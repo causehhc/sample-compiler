@@ -122,7 +122,7 @@ class SMC_analyzer(Parser_analyzer):
                 res += "{} ".format(item)
             T = self.arith_mid(res, temp_flag=temp_flag)
             if T is None:
-                T = res
+                T = res[:-1]
             res = T
         if ops is not None:
             if temp_flag:
@@ -139,11 +139,14 @@ class SMC_analyzer(Parser_analyzer):
             type = type_node.tag
             child = self.AST_Tree.children(node.identifier)
             var_decl_table_node = child[1]
+            table_child = self.AST_Tree.children(var_decl_table_node.identifier)
+            if table_child[1].tag == 'expr':
+                self.AST_Tree.remove_node(table_child[1].identifier)
             var_decl_table_tree = self.AST_Tree.subtree(var_decl_table_node.identifier)
             var_decl_table = var_decl_table_tree.leaves()
             var = [child[0]]
             for item in var_decl_table:
-                if item.tag == 'var' and len(self.AST_Tree.siblings(item.identifier)) == 0:
+                if item.tag == 'var':
                     var.append(item)
             for item in var:
                 sym = Symbol(item, type, child[0].data.scope)
