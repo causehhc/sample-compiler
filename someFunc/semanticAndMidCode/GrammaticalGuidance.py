@@ -143,7 +143,7 @@ class SMC_analyzer(Parser_analyzer):
             var_decl_table = var_decl_table_tree.leaves()
             var = [child[0]]
             for item in var_decl_table:
-                if item.tag == 'var':
+                if item.tag == 'var' and len(self.AST_Tree.siblings(item.identifier)) == 0:
                     var.append(item)
             for item in var:
                 sym = Symbol(item, type, child[0].data.scope)
