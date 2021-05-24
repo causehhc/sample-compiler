@@ -57,7 +57,7 @@ def main_ft_SMC():
     :return:
     """
     text = open('./input_temp.c', 'r', encoding='utf-8').read()
-    # text = open('./testfiles/test9.txt', 'r', encoding='utf-8').read()
+    # text = open('./testfiles/test1.txt', 'r', encoding='utf-8').read()
 
     lex_anal = Lex_analyzer()
     lex_anal.set_text(text)
@@ -77,14 +77,16 @@ def main_ft_SMC():
     symbol_table, op_stack = SMC_anal.dfs_detect()  # 返回符号表及四元式组
     symbol_table_new = []
     op_stack_new = []
+    print('符号表')
     for item in symbol_table.items():
         temp = item[0]
         symbol_table_new.append(temp)
         print(temp)
+    print('中间代码')
     for item in op_stack:
         temp = [item.op, item.a1, item.a2, item.res]
         op_stack_new.append(temp)
-        print(temp)
+        print(op_stack.index(item), temp)
 
 
 if __name__ == '__main__':

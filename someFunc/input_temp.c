@@ -1,18 +1,17 @@
-int_t main (){
-    int i=a-b;
-    while(i>0){
-        i = 1;
+//for
+int_t main()
+
+{
+  int i,N,sum = 0;
+  N = read();
+  for(i=1;i<=N;i=i+1){
+
+     if(i==1){
+	sum = sum+i;
+     }
+
     }
-    if (i==0){
-        i=2;
-        if (i==2){
-            int j=0;
-            i=3;
-        }else{
-            i=4;
-        }
-    }else{
-        i=6;
-    }
-    return 0;
+
+  write(sum);
+
 }
