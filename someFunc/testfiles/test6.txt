@@ -12,7 +12,8 @@ int_t main()
 	    sum = sum+i;
       }
   }
-  else if(choice == 2){
+  if(choice == 2){
+//  else if(choice == 2){
       i=0;
       while(i<N){
       sum = sum + i;

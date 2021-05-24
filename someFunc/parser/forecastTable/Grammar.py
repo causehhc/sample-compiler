@@ -127,16 +127,22 @@ class Parser_analyzer:
         self.node_parent_dict = {start: [None]}
 
     def table_show(self):
-        print(self.Vt)
+        res = ''
+        # print(self.Vt)
+        res += "{}\n".format(str(self.Vt))
         idx = 0
         for item in self.table:
-            print('{}'.format(self.Vn[idx]), end='\t')
+            # print('{}'.format(self.Vn[idx]), end='\t')
+            res+="{}\t".format(self.Vn[idx])
             idx2 = 0
             for jt in item:
-                print('\'{}\'({})'.format(jt, self.Vt[idx2]), end=' ')
+                # print('\'{}\'({})'.format(jt, self.Vt[idx2]), end=' ')
+                res+="'{}'({}) ".format(jt, self.Vt[idx2])
                 idx2 += 1
-            print()
+            # print()
+            res+='\n'
             idx += 1
+        return res
 
     def ans_show(self):
         print(self.stack_anls)
@@ -159,6 +165,8 @@ class Parser_analyzer:
         dot.render('{}/tree'.format(root_dir), format='png')
 
     def run(self, log=False):
+        anlsRes=''
+        anlsLog=''
         toke = self.stack_toke.pop(-1)
         symbol = self.stack_anls.pop(-1)
         while symbol != '#':
@@ -180,7 +188,8 @@ class Parser_analyzer:
                     self.node_parent_dict.pop(symbol)
                 toke = self.stack_toke.pop(-1)
                 if log:
-                    print('\t*HIT: {}\t<-\t{}'.format(symbol, toke))
+                    # print('\t*HIT: {}\t<-\t{}'.format(symbol, toke))
+                    anlsLog+="\t*HIT: {}\t<-\t{}\n".format(symbol, toke)
                 if toke == '#':
                     break
             elif symbol in self.Vn:
@@ -190,7 +199,8 @@ class Parser_analyzer:
                     table_item = self.table[self.Vn.index(symbol)][self.Vt.index(toke.tag)]
                 table_item = table_item.split(' ')
                 if table_item[0] == '':  # 错误分析
-                    print('\t*ERROR: {}\t<-\t{}'.format(symbol, toke))
+                    # print('\t*ERROR: {}\t<-\t{}'.format(symbol, toke))
+                    anlsLog += "\t*ERROR: {}\t<-\t{}\n".format(symbol, toke)
                     self.err_info.append(
                         "row: {}, col: {}, token: '{}' cont match '{}'\n".format(toke.row, toke.col, toke, symbol))
                 elif table_item[0] == 'eps':  # 无效回溯
@@ -216,16 +226,21 @@ class Parser_analyzer:
                             self.node_parent_dict[item] = []
                         self.node_parent_dict[item].append(self.parent_uid)
                     if log:
-                        print()
-                        print("symb:\'{}\'----stack:{}".format(symbol, list(reversed(self.stack_anls))))
-                        print("toke:{}----stack:{}".format(toke, list(reversed(self.stack_toke))))
+                        # print()
+                        # print("symb:\'{}\'----stack:{}".format(symbol, list(reversed(self.stack_anls))))
+                        # print("toke:{}----stack:{}".format(toke, list(reversed(self.stack_toke))))
+                        anlsLog += "\n"
+                        anlsLog += "symb:\'{}\'----stack:{}\n".format(symbol, list(reversed(self.stack_anls)))
+                        anlsLog += "toke:{}----stack:{}\n".format(toke, list(reversed(self.stack_toke)))
             symbol = self.stack_anls.pop(-1)
         self.node_parent_dict.clear()
         # self.ans_show()
         if len(self.err_info) == 0:
-            print('match compete!')
+            # print('match compete!')
+            anlsRes+="match compete!\n"
         for item in self.err_info:
-            print(item)
+            anlsRes += "{}".format(item)
+        return anlsRes, anlsLog
 
 
 def main():

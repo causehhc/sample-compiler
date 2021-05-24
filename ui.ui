@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
-    <height>629</height>
+    <width>1031</width>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,9,1">
       <item>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="enabled">
@@ -83,95 +83,37 @@
        </widget>
       </item>
       <item>
-       <widget class="QSplitter" name="splitter_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Edit</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QTextEdit" name="textEditMain">
-            <property name="cursor" stdset="0">
-             <cursorShape>IBeamCursor</cursorShape>
-            </property>
-            <property name="mouseTracking">
-             <bool>true</bool>
-            </property>
-            <property name="lineWrapMode">
-             <enum>QTextEdit::NoWrap</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QSplitter" name="splitter">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <widget class="QGroupBox" name="groupBox_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>Result</string>
+           <string>Edit</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QTextEdit" name="textEditRes">
-             <property name="palette">
-              <palette>
-               <active>
-                <colorrole role="Base">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>240</red>
-                   <green>240</green>
-                   <blue>240</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </active>
-               <inactive>
-                <colorrole role="Base">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>240</red>
-                   <green>240</green>
-                   <blue>240</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </inactive>
-               <disabled>
-                <colorrole role="Base">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>240</red>
-                   <green>240</green>
-                   <blue>240</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </disabled>
-              </palette>
+            <widget class="QTextEdit" name="textEditMain">
+             <property name="cursor" stdset="0">
+              <cursorShape>IBeamCursor</cursorShape>
+             </property>
+             <property name="mouseTracking">
+              <bool>true</bool>
              </property>
              <property name="lineWrapMode">
               <enum>QTextEdit::NoWrap</enum>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
-           <string>Info</string>
+           <string>Log</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QTextEdit" name="textEditInfo">
+            <widget class="QTextEdit" name="textEditLog">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -222,7 +164,63 @@
            </item>
           </layout>
          </widget>
-        </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Result</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QTextEdit" name="textEditRes">
+           <property name="palette">
+            <palette>
+             <active>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>240</red>
+                 <green>240</green>
+                 <blue>240</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>240</red>
+                 <green>240</green>
+                 <blue>240</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="Base">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>240</red>
+                 <green>240</green>
+                 <blue>240</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QTextEdit::NoWrap</enum>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -234,7 +232,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>705</width>
+     <width>1031</width>
      <height>26</height>
     </rect>
    </property>
@@ -261,30 +259,26 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
    </widget>
-   <widget class="QMenu" name="menuLexicalAnalysis">
+   <widget class="QMenu" name="menuLexical">
     <property name="title">
-     <string>LexicalAnls</string>
+     <string>Lexical</string>
     </property>
-    <addaction name="actionLexicalAnalyzer"/>
+    <addaction name="actionLexical"/>
     <addaction name="actionNFA_DFA_MFA"/>
    </widget>
    <widget class="QMenu" name="menuParsing">
     <property name="title">
      <string>Parsing</string>
     </property>
-    <addaction name="actionParser"/>
-    <addaction name="actionLL_1_PreAnalysis"/>
-    <addaction name="actionOptrPRY"/>
+    <addaction name="actionRecuDescent"/>
+    <addaction name="actionForecastTable"/>
+    <addaction name="actionOptrPreced"/>
    </widget>
    <widget class="QMenu" name="menuMidCode">
     <property name="title">
      <string>MidCode</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuAimCode">
-    <property name="title">
-     <string>AimCode</string>
-    </property>
+    <addaction name="actionGramGuide"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -303,10 +297,9 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuLexicalAnalysis"/>
+   <addaction name="menuLexical"/>
    <addaction name="menuParsing"/>
    <addaction name="menuMidCode"/>
-   <addaction name="menuAimCode"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -329,9 +322,7 @@
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
    <addaction name="separator"/>
-   <addaction name="actionLexicalAnalyzer"/>
-   <addaction name="actionParser"/>
-   <addaction name="actionSymbol"/>
+   <addaction name="actionInterpreter_3"/>
    <addaction name="separator"/>
    <addaction name="actionAbout"/>
   </widget>
@@ -380,7 +371,7 @@
     <string>Paste</string>
    </property>
   </action>
-  <action name="actionLexicalAnalyzer">
+  <action name="actionLexical">
    <property name="text">
     <string>LexicalAnalyzer</string>
    </property>
@@ -393,19 +384,19 @@
     <string>NFA_DFA_MFA</string>
    </property>
   </action>
-  <action name="actionParser">
+  <action name="actionRecuDescent">
    <property name="text">
-    <string>Parser</string>
+    <string>RecuDescent</string>
    </property>
   </action>
-  <action name="actionLL_1_PreAnalysis">
+  <action name="actionForecastTable">
    <property name="text">
-    <string>LL(1)PreAnls</string>
+    <string>ForecastTable</string>
    </property>
   </action>
-  <action name="actionOptrPRY">
+  <action name="actionOptrPreced">
    <property name="text">
-    <string>OptrPRY</string>
+    <string>OptrPreced</string>
    </property>
   </action>
   <action name="actionTool">
@@ -442,6 +433,36 @@
   <action name="actionNew">
    <property name="text">
     <string>New</string>
+   </property>
+  </action>
+  <action name="actionGramGuide">
+   <property name="text">
+    <string>GramGuide</string>
+   </property>
+  </action>
+  <action name="actionStart_2">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionInterpreter">
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionInterpreter_2">
+   <property name="text">
+    <string>Interpreter</string>
+   </property>
+  </action>
+  <action name="actionInterpreter_3">
+   <property name="text">
+    <string>Interpreter</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log</string>
    </property>
   </action>
  </widget>

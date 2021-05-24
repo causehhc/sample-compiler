@@ -186,9 +186,13 @@ class SMC_analyzer(Parser_analyzer):
         if node.tag == "if":
             siblings = self.AST_Tree.siblings(node.identifier)
             ctrl_0 = siblings[1]  # 跳转条件
-            self.expr_processing(ctrl_0)
-            new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_symbol_stack) - 1), '-',
-                                 "{}".format(len(self.op_stack) + 2))
+            flag = self.expr_processing(ctrl_0)
+            if flag is None:
+                new_op2 = Quaternion('jnz', "T{}".format(len(self.temp_symbol_stack) - 1), '-',
+                                     "{}".format(len(self.op_stack) + 2))
+            else:
+                new_op2 = Quaternion('jnz', "{}".format(flag), '-',
+                                     "{}".format(len(self.op_stack) + 2))
             new_op3 = Quaternion('j', "-", '-', "{}".format('None', 'None'))
             self.op_stack.extend([new_op2, new_op3])
             self.jump_stack.extend([self.op_stack.index(new_op3)])
@@ -230,7 +234,7 @@ class SMC_analyzer(Parser_analyzer):
                 aim_node = siblings[0]
                 if aim_node.tag == "if":
                     child = self.AST_Tree.siblings(aim_node.identifier)
-                    if len(child) == 5:  # 有else才产生特殊j
+                    if len(child) == 5 and self.AST_Tree.children(child[4].identifier)[0].tag == 'else':  # 有else才产生特殊j
                         new_op = Quaternion('j', "-", '-', "{}".format('None'))
                         self.op_stack.extend([new_op])
                         self.jump_queue.extend([self.op_stack.index(new_op)])
@@ -294,6 +298,8 @@ class SMC_analyzer(Parser_analyzer):
                         self.op_stack[idx].res = "{}".format(len(self.op_stack))
 
     def dfs_detect(self):
+        anlsRes = ''
+        anlsLog = ''
         res1 = False
         info1 = []
         res2 = False
@@ -318,18 +324,22 @@ class SMC_analyzer(Parser_analyzer):
                         stack.extend(list(reversed(self.AST_Tree.children(node.identifier))))
             if res1 is False or res2 is False:
                 if res1 is False:
-                    print("Error: Variable definition")
-                    print(info1)
+                    # print("Error: Variable definition")
+                    anlsRes+="Error: Variable definition\n"
+                    # print(info1)
+                    anlsLog+="{}\n".format(info1)
                 if res2 is False:
-                    print("Error: Variable is not defined")
-                    print(info2)
+                    # print("Error: Variable is not defined")
+                    anlsRes += "Error: Variable is not defined\n"
+                    # print(info2)
+                    anlsLog += "{}\n".format(info2)
                 break
         if res1 and res2:
             new_op = Quaternion('sys', '-', '-', "-")
             self.op_stack.append(new_op)
-            return self.symbol_table, self.op_stack
+            return self.symbol_table, self.op_stack, True
         else:
-            return None
+            return anlsRes, anlsLog, False
 
 
 def main():
