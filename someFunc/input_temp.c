@@ -1,5 +1,5 @@
 int_t main (){
-    int i=1+2+3;
+    int i=a-b;
     while(i>0){
         i = 1;
     }

@@ -66,6 +66,8 @@ class SMC_analyzer(Parser_analyzer):
             else:
                 a = opnd.pop(-1)
                 b = opnd.pop(-1)
+                if postexp[i] in {'-', '/'}:
+                    a, b = b, a
                 T = "T{}".format(len(self.temp_stack))
                 self.temp_stack.append(T)
                 opnd.append(T)
