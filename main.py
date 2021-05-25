@@ -5,6 +5,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
 
+from someFunc.Interpreter.InterpreterAnls import Analyzer
 from someFunc.lexical.Automata import Lex_analyzer
 from someFunc.parser.OperatorPrecedence.Grammar import Parser_analyzer_op
 from someFunc.parser.forecastTable.Grammar import Parser_analyzer
@@ -199,7 +200,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         content = self.textEditMain.toPlainText()
         self.anlsRes = ''
         self.anlsLog = ''
-        # TODO
+
         parser_anal = Parser_analyzer_op()
         parser_anal.load_stack(content)
         self.anlsRes, self.anlsLog = parser_anal.run(log=True)
@@ -213,7 +214,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.LexAnls()
         self.anlsRes = ''
         self.anlsLog = ''
-        # TODO
+
         path1 = 'someFunc/parser/forecastTable/grammer_LL(1).txt'
         path2 = 'someFunc/parser/forecastTable/ff_set.txt'
         SMC_anal = SMC_analyzer()
@@ -246,7 +247,42 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.textEditLog.setText(self.anlsLog)
 
     def Interpreter(self):
-        print('test')
+        self.LexAnls()
+        self.anlsRes = ''
+        self.anlsLog = ''
+
+        path1 = 'someFunc/parser/forecastTable/grammer_LL(1).txt'
+        path2 = 'someFunc/parser/forecastTable/ff_set.txt'
+        SMC_anal = SMC_analyzer()
+        SMC_anal.load_analyzer(path1, path2)
+        SMC_anal.load_stack(self.token_list, 'program')
+        SMC_anal.run(log=True)
+
+        # 宋哥必看
+        symbol_table, op_stack, flag = SMC_anal.dfs_detect()  # 返回符号表及四元式组
+        symbol_table_new = []
+        op_stack_new = []
+        list_hs = []
+        for item in symbol_table.items():
+            temp = item[0]
+            symbol_table_new.append(temp)
+        for item in op_stack:
+            temp = [item.op, item.a1, item.a2, item.res]
+            op_stack_new.append(temp)
+            # print(op_stack_new.index(temp), temp)
+            self.anlsLog += "{} {}\n".format(op_stack_new.index(temp), temp)
+
+        inter_anls = Analyzer()
+        dict_fuh = {
+            'temp': 0,
+        }
+        for fuh in symbol_table_new:
+            dict_fuh[fuh] = 0
+        self.anlsRes = inter_anls.jieshiqi(dict_fuh, op_stack_new, list_hs)
+
+        self.textEditRes.clear()
+        self.textEditRes.setText(self.anlsRes)
+        self.textEditLog.setText(self.anlsLog)
 
     # Help
     def open_help(self):

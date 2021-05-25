@@ -208,7 +208,7 @@ OUTPUT:
 Error: Variable is not defined
 ["'j'(var)[5, 4]None"]
 ```
-- 中间代码生成
+- 中间代码生成  
 example: test6.txt  
 ```text
 //if

@@ -10,8 +10,9 @@ int_t main()
       {
 
         int tmp = i%2;
-         if(tmp == 1)
-	    sum = sum+i;
+         if(tmp == 1){
+	           sum = sum+i;
+	    }
       }
   }
   if(choice == 2){
