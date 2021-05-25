@@ -6,6 +6,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QUndoStack, QMessageBox, QLabel
 
 from someFunc.lexical.Automata import Lex_analyzer
+from someFunc.parser.OperatorPrecedence.Grammar import Parser_analyzer_op
 from someFunc.parser.forecastTable.Grammar import Parser_analyzer
 from someFunc.parser.recursiveDescent.Statement import Match_program_stmt
 from someFunc.semanticAndMidCode.GrammaticalGuidance import SMC_analyzer
@@ -194,10 +195,14 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.textEditLog.setText(self.anlsLog)
 
     def OptrPreced(self):
-        self.LexAnls()
+        # self.LexAnls()
+        content = self.textEditMain.toPlainText()
         self.anlsRes = ''
         self.anlsLog = ''
         # TODO
+        parser_anal = Parser_analyzer_op()
+        parser_anal.load_stack(content)
+        self.anlsRes, self.anlsLog = parser_anal.run(log=True)
 
         self.textEditRes.clear()
         self.textEditRes.setText(self.anlsRes)
@@ -248,7 +253,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         os.startfile('"help.docx"')
 
     def about_dialog(self):
-        QMessageBox.about(self, "国产正版", "廖语言编译器威力加强无敌版V99.9")
+        QMessageBox.about(self, "国产正版", "1823020232")
 
 
 class MySubForm(QMainWindow, Ui_rndm):

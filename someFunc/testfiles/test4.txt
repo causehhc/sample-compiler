@@ -6,8 +6,8 @@ int_t main()
   N = read();
   for(i=1;i<=N;i=i+1)
 {
-
-     if(i%2 == 1)
+    int tmp = i%2;
+     if(tmp == 1)
 	sum = sum+i;
     }
 

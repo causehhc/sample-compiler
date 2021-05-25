@@ -9,7 +9,8 @@ int_t main(){
 	int M = read() ;
     
     if (M >= N){result = M ;}
-	else {result = N;}
+	//else {result = N;}
+	if(M<N){result = N;}
 	a = result + 100 ;
 	write(a);
 

@@ -61,8 +61,8 @@ def main_ft_SMC():
     预测分析+词法分析（生成中间代码）
     :return:
     """
-    text = open('./input_temp.c', 'r', encoding='utf-8').read()
-    # text = open('./testfiles/test6.txt', 'r', encoding='utf-8').read()
+    # text = open('./input_temp.c', 'r', encoding='utf-8').read()
+    text = open('./testfiles/test4_1.txt', 'r', encoding='utf-8').read()
 
     lex_anal = Lex_analyzer()
     lex_anal.set_text(text)

@@ -17,10 +17,11 @@ int_t main()
     }
 
 //    else {
+    if(n>=1){
 
-//       factor=1;
+       factor=1;
 
-//    }
+    }
 
   while(i<n)
 {

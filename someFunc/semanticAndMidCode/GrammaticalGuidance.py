@@ -61,7 +61,7 @@ class SMC_analyzer(Parser_analyzer):
         postexp = postexp.split(' ')
         postexp = postexp[::-1]
         postexp.pop(0)
-        op = {'+', '-', '*', '/'}
+        op = {'+', '-', '*', '/', '%'}
         opnd = []
         T = None
         for i in range(len(postexp)):
@@ -70,7 +70,7 @@ class SMC_analyzer(Parser_analyzer):
             else:
                 a = opnd.pop(-1)
                 b = opnd.pop(-1)
-                if postexp[i] in {'-', '/'}:
+                if postexp[i] in {'-', '/', '%'}:
                     a, b = b, a
                 T = "T{}".format(len(self.temp_symbol_stack))
                 self.temp_symbol_stack.append(T)
@@ -139,10 +139,10 @@ class SMC_analyzer(Parser_analyzer):
             type = type_node.tag
             child = self.AST_Tree.children(node.identifier)
             var_decl_table_node = child[1]
-            table_child = self.AST_Tree.children(var_decl_table_node.identifier)
-            if len(table_child) > 1 and table_child[1].tag == 'expr':
-                self.AST_Tree.remove_node(table_child[1].identifier)
             var_decl_table_tree = self.AST_Tree.subtree(var_decl_table_node.identifier)
+            var_decl_table_tree_child = var_decl_table_tree.children(var_decl_table_node.identifier)
+            if len(var_decl_table_tree_child) > 1 and var_decl_table_tree_child[1].tag == 'expr':
+                var_decl_table_tree.remove_node(var_decl_table_tree_child[1].identifier)
             var_decl_table = var_decl_table_tree.leaves()
             var = [child[0]]
             for item in var_decl_table:

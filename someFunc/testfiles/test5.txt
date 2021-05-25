@@ -7,7 +7,9 @@ int_t main(){
     N = read();
 
     while(i < N){
-       if(i%2 == 0){
+
+        int tmp = i%2;
+       if(tmp == 0){
            sum = sum +i;
        }
        i = i + 1;

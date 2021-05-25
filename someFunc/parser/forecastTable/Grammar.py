@@ -133,14 +133,14 @@ class Parser_analyzer:
         idx = 0
         for item in self.table:
             # print('{}'.format(self.Vn[idx]), end='\t')
-            res+="{}\t".format(self.Vn[idx])
+            res += "{}\t".format(self.Vn[idx])
             idx2 = 0
             for jt in item:
                 # print('\'{}\'({})'.format(jt, self.Vt[idx2]), end=' ')
-                res+="'{}'({}) ".format(jt, self.Vt[idx2])
+                res += "'{}'({}) ".format(jt, self.Vt[idx2])
                 idx2 += 1
             # print()
-            res+='\n'
+            res += '\n'
             idx += 1
         return res
 
@@ -165,8 +165,8 @@ class Parser_analyzer:
         dot.render('{}/tree'.format(root_dir), format='png')
 
     def run(self, log=False):
-        anlsRes=''
-        anlsLog=''
+        anlsRes = ''
+        anlsLog = ''
         toke = self.stack_toke.pop(-1)
         symbol = self.stack_anls.pop(-1)
         while symbol != '#':
@@ -189,7 +189,7 @@ class Parser_analyzer:
                 toke = self.stack_toke.pop(-1)
                 if log:
                     # print('\t*HIT: {}\t<-\t{}'.format(symbol, toke))
-                    anlsLog+="\t*HIT: {}\t<-\t{}\n".format(symbol, toke)
+                    anlsLog += "\t*HIT: {}\t<-\t{}\n".format(symbol, toke)
                 if toke == '#':
                     break
             elif symbol in self.Vn:
@@ -237,7 +237,7 @@ class Parser_analyzer:
         # self.ans_show()
         if len(self.err_info) == 0:
             # print('match compete!')
-            anlsRes+="match compete!\n"
+            anlsRes += "match compete!\n"
         for item in self.err_info:
             anlsRes += "{}".format(item)
         return anlsRes, anlsLog

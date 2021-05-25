@@ -1,4 +1,4 @@
-class Parser_analyzer:
+class Parser_analyzer_op:
     def __init__(self):
         self.Gdict = {  # 算术表达式文法
             'G': ['#E#'],
@@ -123,60 +123,146 @@ class Parser_analyzer:
                     if self.opTable[0][j] == y:
                         return self.opTable[i][j]
 
+    def releft(self, str):
+        strs = ''
+        k = 0
+        if len(str) == 3:
+            for temp in self.Gdict:
+                if temp in str[2]:
+                    for i in range(2):
+                        strs = strs + str[i]
+                    strs = strs + k
+                k = temp
+
+        for i in range(2):
+            for temp in self.Gdict:
+                ch = temp
+                for item in self.Gdict[temp]:
+                    if len(item) != len(str):
+                        continue
+                    for i in range(len(str)):
+                        if 65 <= ord(str[i]) <= 90:
+                            if 65 <= ord(item[i]) <= 90:
+                                pass
+                                # print('')
+                            else:
+                                break
+                        else:
+                            if ord(str[i]) != ord(item[i]):
+                                break
+                    if str in item:
+                        return ch
+            if len(strs) == 3:
+                str = ''
+                for i in strs:
+                    str = str + i
+        return 0
+
     def run(self, log=False):
+        anlsRes = ''
+        anlsLog = ''
         self.get_firstVT()
         self.get_lastVT()
         self.get_opTable()
-        print(self.fvt)
-        print(self.lvt)
+        # print(self.fvt)
+        anlsRes+="{}\n".format(self.fvt)
+        # print(self.lvt)
+        anlsRes += "{}\n".format(self.lvt)
         for item in self.opTable:
-            print(item)
+            # print(item)
+            anlsRes += "{}\n".format(item)
 
-        n = ''
-        sbuff = list(self.stack_toke)
-        print(sbuff)
-        top = 1
-        s = ['', '#']
-        a = sbuff[-1]
-        while a != '#':
-            if s[top] in self.vt:
+        token_list = list(self.stack_toke)
+        token = token_list[-1]
+        symbol = ['#', 'i']
+        # print(sbuff)
+        flag_gui = 0
+        top = 0
+        flag_re = 0
+        guiyue = 0
+        staus = 0
+        catch = 0
+        while token != '#' or (symbol[1] in self.vt or len(symbol) != 2):
+            if catch == 0:
+                symbol.pop()
+            catch = catch + 1
+            if flag_gui == 1 and (token_list[len(token_list) - 1 - top] != 'E'):
+                token_list[len(token_list) - 1 - top] = self.releft(token_list[len(token_list) - 1 - top])
+                flag_gui = 0
+                token = token_list[len(token_list) - 1 - top]
+            if symbol[top] in self.vt:
                 j = top
             else:
                 j = top - 1
-            v = self.getOutvalue(s[j], a)
-            while v == 3:
-                q = s[j]
-                if s[j - 1] in self.vt:
+            v = self.getOutvalue(symbol[j], token)
+            while v != 1 and v != 2:
+                q = symbol[j]
+                if symbol[j - 1] in self.vt:
                     j = j - 1
                 else:
                     j = j - 2
-                v = self.getOutvalue(s[j], q)
-                tp = s[j + 1:top + 1]
-                for i in range(len(tp)):
-                    c = s.pop()
-                    temp_dict = {'i': 'F', '*': 'T', '+': 'E'}
-                    n = temp_dict[c]
-                s.append(n)
+                v = self.getOutvalue(symbol[j], q)
+                temp = ''
+                time = 0
+                if j + 1 == top:
+                    temp += str(symbol[j + 1])
+                    guiyue = 1
+                else:
+                    for i in range(2):
+                        time = time + 1
+                    temp += str(symbol[j + 1])
+                    temp += str(symbol[j + 2])
+                    temp += token
+                temp = self.releft(str(temp))
+                if temp != 0:
+                    while time != 0:
+                        time = time - 1
+                        symbol.pop()
+                    if guiyue == 0:
+                        symbol.append(temp)
+                        staus = 1
+                    else:
+                        if flag_re == 1:
+                            symbol.append(temp)
+                            staus = 3
+                        else:
+                            symbol[j + 1] = temp
+                    guiyue = 0
+                else:
+                    staus = 0
                 top = j + 1
-            if v == 2 or v == 1:
-                top = top + 1
-                s.append(a)
-                sbuff.pop()
-            else:
-                self.err_info.append('Error!')
-                break
-            a = sbuff[-1]
+            if v == 1 or v == 2:
+                if staus == 0:
+                    top = top + 1
+                    symbol.append(token)
+                token_list.pop()
+                staus = 0
+            if len(token_list) == 0:
+                for i in range(len(symbol) - 1):
+                    token_list.append(symbol[i])
+                symbol = ['#']
+                self.vn.pop()
+                top = 0
+                flag_gui = 1
+                flag_re = 1
+            token = token_list[-1]
             if log:
-                print(s)
-                print(sbuff)
-                print()
-        print(self.err_info)
+                # print(s)
+                # print(sbuff)
+                # print()
+                anlsLog += '{}\n'.format(symbol)
+                anlsLog += '{}\n'.format(token_list)
+                anlsLog += '\n'
+
+        return anlsRes, anlsLog
 
 
 def main():
-    t = Parser_analyzer()
+    t = Parser_analyzer_op()
     t.load_stack('i+i*i')
-    t.run(log=True)
+    res, log = t.run(log=True)
+    # print(res)
+    print(log)
 
 
 if __name__ == '__main__':

@@ -7,7 +7,10 @@ int_t main(){
     for(i=2;i<=N;i=i+1) {
        nprime = 0;
        for(j=2;j<i;j=j+1) {
-	   if(i%j == 0) nprime = nprime + 1;
+	   int tmp = i%j;
+	   if(tmp == 0) {
+	   nprime = nprime + 1;
+	   }
        }
        if(nprime == 0) {
             write(i);
