@@ -22,21 +22,22 @@ class Analyzer:
         jum = int(0)
         result = None
         while i < j:
-            print('step',i)
+            # print('step', i)
+            anlsRes += "step {}\n".format(i)
             if list_four[i][0] == 'main':
                 i += 1
                 continue
             elif list_four[i][0] == 'sys':
                 break
             elif list_four[i][0] == 'call':
-                if list_four[i][1] == 'read':
-                    dict_temp[list_four[i][3]] = input('请输入参数')
-                elif list_four[i][1] == 'write':
-                    print('输出')
+                if list_four[i][1] == 'write':
+                    # print('输出')
                     anlsRes += "Output: \n"
                     for va in list_para:
-                        print(va)
-                        anlsRes += "{} ".format(va)
+                        # print(va)
+                        anlsRes += "{}\n".format(va)
+                # elif list_four[i][1] == 'read':
+                #     dict_temp[list_four[i][3]] = input('请输入参数')
                 else:
                     if result is None:
                         cs = 1
@@ -155,7 +156,7 @@ class Analyzer:
                     i = jum + 1
                     continue
             if list_four[i][3] in dict_fuh.keys():
-                print(list_four[i][3], '\t', dict_fuh[list_four[i][3]])
+                # print(list_four[i][3], '\t', dict_fuh[list_four[i][3]])
                 anlsRes += "{}\t{}\n".format(list_four[i][3], dict_fuh[list_four[i][3]])
             i += 1
         return anlsRes

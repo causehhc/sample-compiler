@@ -1,16 +1,18 @@
-//for
-int_t main()
+//if
 
-{
-  int i,N,sum = 0;
-  N = read();
-  for(i=1;i<=N;i=i+1)
-{
-    int tmp = i%2;
-     if(tmp == 1)
-	sum = sum+i;
-    }
+int a = 1 ;
 
-  write(sum);
+int_t main(){
+
+    int result ;
+	int N = 1 ;
+	int M = 2 ;
+
+    if (M >= N){result = M ;}
+	//else {result = N;}
+	if(M<N){result = N;}
+	a = result + 100 ;
+	write(a);
 
 }
+

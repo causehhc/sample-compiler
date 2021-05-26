@@ -10,9 +10,9 @@ from someFunc.lexical.Automata import Lex_analyzer
 from someFunc.parser.OperatorPrecedence.Grammar import Parser_analyzer_op
 from someFunc.parser.forecastTable.Grammar import Parser_analyzer
 from someFunc.parser.recursiveDescent.Statement import Match_program_stmt
+from someFunc.re2mdfa.Rndm import regexToNfa, nfaToDfa, minDfa
 from someFunc.semanticAndMidCode.GrammaticalGuidance import SMC_analyzer
 from ui import Ui_MainWindow
-from subui import Ui_rndm
 
 
 class MyMainForm(QMainWindow, Ui_MainWindow):
@@ -94,6 +94,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
     def open_file(self):
         fileName, fileType = QtWidgets.QFileDialog.getOpenFileName(self, "打开文件", os.getcwd(),
                                                                    "All Files(*);;Text Files(*.txt)")
+        if fileName == '' or fileType == '':
+            return
         self.openedFileName = fileName
         self.lineEditPath.setText(fileName)
 
@@ -108,8 +110,10 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
             path = (os.getcwd() + '\\' + item).replace('\\', '/')
             paths.append(path)
         if fileName not in paths:
-            fileName, filetype = QtWidgets.QFileDialog.getSaveFileName(self, "保存文件", os.getcwd(),
+            fileName, fileType = QtWidgets.QFileDialog.getSaveFileName(self, "保存文件", os.getcwd(),
                                                                        "All Files (*);;Text Files (*.txt)")
+            if fileName == '' or fileType == '':
+                return
             if self.openedFileName == '':
                 self.lineEditPath.setText(fileName)
         fileContent = self.textEditMain.toPlainText()
@@ -135,7 +139,6 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
     # LexAnls
     def LexAnls(self):
         content = self.textEditMain.toPlainText()
-        # TODO
         lex_anal = Lex_analyzer()
         lex_anal.set_text(content)
         token_list, info_list = lex_anal.get_token_info()
@@ -156,8 +159,24 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.textEditLog.setText(self.anlsLog)
 
     def rndm(self):
-        pass
-        # my_subWin.show()
+        self.anlsRes = ''
+        self.anlsLog = ''
+        content = self.textEditMain.toPlainText()
+
+        nfa = regexToNfa(content)
+        nfa.view('someFunc/re2mdfa')
+        self.anlsRes += 'NFA create finished!\n'
+        dfa = nfaToDfa(nfa)
+        dfa.view('someFunc/re2mdfa')
+        self.anlsRes += 'DFA create finished!\n'
+        mdfa = minDfa(dfa)
+        mdfa.view('someFunc/re2mdfa')
+        self.anlsRes += 'MDFA create finished!\n'
+        self.anlsRes += "Created in './out/*'\n"
+
+        self.textEditRes.clear()
+        self.textEditRes.setText(self.anlsRes)
+        self.textEditLog.setText(self.anlsLog)
 
     # Parsing
     def RecuDescent(self):
@@ -170,6 +189,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         res, idx, tree, error_list = parser_anal.run(True)
         self.anlsRes = '{}\n{}'.format(res, error_list)
         self.anlsLog = parser_anal.tree.show(stdout=False)
+        if self.actionTreePic.isChecked():
+            parser_anal.create_dotPic('someFunc/treePic')
 
         self.textEditRes.clear()
         self.textEditRes.setText(self.anlsRes)
@@ -189,7 +210,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         self.anlsRes, log = parser_anal.run(log=True)
         self.anlsLog += log
         self.anlsLog += parser_anal.AST_Tree.show(stdout=False)
-        # parser_anal.create_dotPic('./treePic')
+        if self.actionTreePic.isChecked():
+            parser_anal.create_dotPic('someFunc/treePic')
 
         self.textEditRes.clear()
         self.textEditRes.setText(self.anlsRes)
@@ -292,43 +314,8 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         QMessageBox.about(self, "国产正版", "1823020232")
 
 
-class MySubForm(QMainWindow, Ui_rndm):
-    def __init__(self):
-        super().__init__()
-        self.setupUi(self)
-        # self.view = QGraphicsView(self)
-        # self.view.setGeometry(0, 0, 710, 650)
-        self.actionStart.clicked.connect(self.start)
-        pix = QPixmap('someFunc/re2mdfa/out/nfa.png')
-        lb1 = QLabel(self)
-        lb1.setGeometry(0, 0, 300, 200)
-        lb1.setStyleSheet("border: 2px solid red")
-        lb1.setPixmap(pix)
-
-    def start(self):
-        content = self.lineEditRe.text()
-        # anls(content)
-        self.graphicsView_nfa.show('./someFunc/out/nfa.png')
-        print('ok')
-        # image_path = './someFunc/out/nfa.png'
-        # print(image_path)
-        # img = cv2.imread(image_path)  # 读取图像
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # 转换图像通道
-        # x = img.shape[1]  # 获取图像大小
-        # y = img.shape[0]
-        # self.zoomscale = 1  # 图片放缩尺度
-        # frame = QImage(img, x, y, QImage.Format_RGB888)
-        # pix = QPixmap.fromImage(frame)
-        # self.item = QGraphicsPixmapItem(pix)  # 创建像素图元
-        # self.scene = QGraphicsScene()  # 创建场景
-        # self.scene.addItem(self.item)
-        # self.view.setScene(self.scene)
-        # self.view.show()
-
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     my_win = MyMainForm()
-    my_subWin = MySubForm()
     my_win.show()
     sys.exit(app.exec_())

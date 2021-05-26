@@ -1,3 +1,4 @@
+import os
 import uuid
 from treelib import Tree
 import graphviz
@@ -98,6 +99,8 @@ class Match_base:
         return self.res, self.index - 1, self.tree, self.info
 
     def create_dotPic(self, root_dir):
+        if not os.path.exists(root_dir):
+            os.makedirs(root_dir)
         self.tree.to_graphviz(filename='{}/tree.dot'.format(root_dir))
         string = open('{}/tree.dot'.format(root_dir)).read()
         dot = graphviz.Source(string)

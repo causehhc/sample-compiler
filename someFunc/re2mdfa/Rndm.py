@@ -1,13 +1,18 @@
+import os
+
 import graphviz
 
 
-def save_and_show(filename, string, end_node, start_node):
+def save_and_show(filename, path, string, end_node, start_node):
     file_dir = filename + '.dot'
-    template = open('template.dot').read()
+    template = open('{}/template.dot'.format(path)).read()
     for e in end_node:
         string += '%s [shape=doublecircle];' % e
     string += 'x [label= "start", shape=none,height=.0,width=.0];x -> {};'.format(start_node)
     string = template % string
+
+    if not os.path.exists('out'):
+        os.makedirs('out')
     with open(file_dir, 'w') as f:
         f.write(string)
     f.close()
@@ -138,9 +143,9 @@ class Node_nfa:
         self.__accept = []
         self.__dot_edge = ''
 
-    def view(self):
+    def view(self, path):
         self.generateGraph(self, [])
-        save_and_show('out/nfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/nfa', path, self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'start':
@@ -218,9 +223,9 @@ class Node_dfa:
         self.__accept = []
         self.__dot_edge = ''
 
-    def view(self):
+    def view(self, path):
         self.generateGraph(self, [])
-        save_and_show('out/dfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/dfa', path, self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'accept':
@@ -334,10 +339,10 @@ class Node_mdfa:
         self.__accept = []
         self.__dot_edge = ''
 
-    def view(self):
+    def view(self, path):
         self.generateGraph(self, [])
         self.__dot_edge = self.__dot_edge.replace(',', '_')
-        save_and_show('out/mdfa', self.__dot_edge, self.__accept, self.__start)
+        save_and_show('out/mdfa', path, self.__dot_edge, self.__accept, self.__start)
 
     def generateGraph(self, node, exist_node):
         if node.type == 'accept':
@@ -543,12 +548,13 @@ def minDfa(dfa):
 
 
 def anls(text):
+
     nfa = regexToNfa(text)
-    nfa.view()
+    nfa.view('.')
     dfa = nfaToDfa(nfa)
-    dfa.view()
+    dfa.view('.')
     mdfa = minDfa(dfa)
-    mdfa.view()
+    mdfa.view('.')
 
 
 def main():
