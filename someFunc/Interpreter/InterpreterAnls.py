@@ -113,11 +113,11 @@ class Analyzer:
                 y = self.getvalue(dict_fuh, dict_temp, list_four[i][2])
                 if x < y:
                     dict_temp[list_four[i][3]] = 1
-                    print(dict_temp[list_four[i][3]])
+                    # print(dict_temp[list_four[i][3]])
                     anlsRes += "{}\n".format(dict_temp[list_four[i][3]])
                 else:
                     dict_temp[list_four[i][3]] = 0
-                    print(dict_temp[list_four[i][3]])
+                    # print(dict_temp[list_four[i][3]])
                     anlsRes += "{}\n".format(dict_temp[list_four[i][3]])
             elif list_four[i][0] == '==':
                 x = self.getvalue(dict_fuh, dict_temp, list_four[i][1])
