@@ -49,10 +49,11 @@ def main_ft():
     parser_anal.load_analyzer(path1, path2)
     parser_anal.load_stack(token_list, 'program')
     anlsLog += parser_anal.table_show()
+    print(parser_anal.table_show())
     anlsRes, log = parser_anal.run(log=True)
     anlsLog += log
     anlsLog += parser_anal.AST_Tree.show(stdout=False)
-    # parser_anal.create_dotPic('./treePic')
+    parser_anal.create_dotPic('./treePic')
     print(anlsRes)
     # print(anlsLog)
 
@@ -146,7 +147,7 @@ def main():
 
 if __name__ == '__main__':
     # main_rd()
-    # main_ft()
+    main_ft()
     # main_ft_SMC()
-    main()
+    # main()
 

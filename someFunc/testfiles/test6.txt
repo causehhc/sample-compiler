@@ -1,4 +1,11 @@
-//if
+/*
+if nesting for and while, first input the given
+number N, then input selection 1 to calculate
+the sum of all odd numbers within 1 to N, input 2
+to calculate the sum of all even numbers,
+otherwise output 0.
+*/
+
 int_t main()
 
 {

@@ -308,7 +308,7 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
 
     # Help
     def open_help(self):
-        os.startfile('"help.docx"')
+        os.startfile('"README.md"')
 
     def about_dialog(self):
         QMessageBox.about(self, "国产正版", "1823020232")
